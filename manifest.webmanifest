@@ -1,0 +1,33 @@
+{
+  "id": "./",
+  "name": "Primer Set",
+  "short_name": "Primer Set",
+  "description": "Rutina de gym para principiantes con calendario, calentamiento, checklist y progreso.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EAF1EF",
+  "theme_color": "#0E7C70",
+  "icons": [
+    {
+      "src": "icons/icon-v9-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-v9-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-v9-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

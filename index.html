@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Primer Set</title>
+<meta name="theme-color" content="#0E7C70">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="icons/icon-v9-48.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/icon-v9-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Primer Set">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Nunito+Sans:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="app">
+  <header class="top" id="top"></header>
+  <main>
+    <section class="view on" id="v-hoy" aria-label="Hoy"></section>
+    <section class="view" id="v-cal" aria-label="Calendario"></section>
+    <section class="view" id="v-rut" aria-label="Mi rutina"></section>
+    <section class="view" id="v-pro" aria-label="Progreso"></section>
+    <section class="view" id="v-per" aria-label="Ajustes"></section>
+  </main>
+</div>
+<nav class="island" id="island" data-open="false" data-chip="false" data-live="false" aria-label="Secciones">
+  <button type="button" class="isl-cur" id="islCur" data-act="islandtoggle" aria-expanded="false" aria-controls="islItems" aria-label="Abrir menú de secciones">
+    <span class="isl-ic" id="islIc" aria-hidden="true">🏠</span><span class="isl-lb" id="islLb">Inicio</span>
+    <span class="isl-time" id="islTime" hidden>00:00</span><span class="isl-caret" aria-hidden="true">▲</span>
+  </button>
+  <div class="isl-items" id="islItems">
+    <button type="button" class="itm" data-act="tab" data-v="hoy" tabindex="-1"><span class="e" aria-hidden="true">🏠</span>Inicio</button>
+    <button type="button" class="itm" data-act="tab" data-v="rut" tabindex="-1"><span class="e" aria-hidden="true">🏋️</span>Rutina</button>
+    <button type="button" class="itm" data-act="tab" data-v="cal" tabindex="-1"><span class="e" aria-hidden="true">📅</span>Calendario</button>
+    <button type="button" class="itm" data-act="tab" data-v="pro" tabindex="-1"><span class="e" aria-hidden="true">📊</span>Progreso</button>
+    <button type="button" class="itm" data-act="tab" data-v="per" tabindex="-1"><span class="e" aria-hidden="true">⚙️</span>Ajustes</button>
+  </div>
+</nav>
+<div class="modal" id="modal" hidden></div>
+<div class="toast" id="toast" hidden role="status" aria-live="polite"></div>
+<div class="modal bottom" id="picker" hidden></div>
+<div class="guide" id="guide" hidden></div>
+<div class="modal" id="legal" hidden style="z-index:60"></div>
+<div class="modal" id="ltest" hidden style="z-index:58"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
