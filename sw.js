@@ -1,5 +1,5 @@
 /* Primer Set: guarda la app en el dispositivo para abrirla sin internet. */
-var VERSION = 'primer-set-20261101141530';
+var VERSION = 'primer-set-20261101181604';
 var SHELL = ['./', 'index.html', 'app.css', 'app.js', 'manifest.webmanifest', 'icon-v9-48.png', 'icon-v9-180.png', 'icon-v9-192.png', 'icon-v9-512.png', 'icon-v9-maskable-512.png'];
 
 self.addEventListener('install', function (e) {

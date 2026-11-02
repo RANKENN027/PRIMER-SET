@@ -125,7 +125,40 @@ var LIB = [
   L('Cuerpo completo', 'Thruster con mancuernas', '⚡', 'reps', 2, 'Sentadilla profunda con las mancuernas en los hombros y empuje explosivo hasta arriba al subir.', [4, 8, 90], 'Piernas, glúteos, hombros y tríceps'),
   L('Cuerpo completo', 'Swing con kettlebell', '🔔', 'reps', 2, 'Lleva la cadera hacia atrás y empújala con fuerza para subir la pesa hasta el pecho; los brazos solo guían.', [4, 12, 60], 'Glúteos, espalda baja, piernas y hombros'),
   L('Cuerpo completo', 'Peso muerto con encogimiento y press', '🏋️', 'reps', 3, 'Sube la barra desde el suelo, llévala a los hombros y empújala sobre la cabeza con el cuerpo firme.', [4, 6, 120], 'Espalda, piernas, glúteos y hombros'),
-  L('Cuerpo completo', 'Remo renegado', '🧗', 'reps', 3, 'En posición de plancha sobre dos mancuernas, rema una a la vez sin girar la cadera.', [3, 8, 75], 'Espalda, abdomen y hombros')
+  L('Cuerpo completo', 'Remo renegado', '🧗', 'reps', 3, 'En posición de plancha sobre dos mancuernas, rema una a la vez sin girar la cadera.', [3, 8, 75], 'Espalda, abdomen y hombros'),
+  L('Piernas y glúteos', 'Sentadilla sumo con mancuerna', '🦵', 'reps', 1, 'Pies bien abiertos y puntas afuera, sostén la mancuerna con ambas manos y baja con la espalda recta.', [3, 10, 90]),
+  L('Piernas y glúteos', 'Step-up con mancuernas', '🪜', 'reps', 1, 'Sube a un banco firme empujando con el talón de la pierna que apoya y baja con control.', [3, 10, 75]),
+  L('Piernas y glúteos', 'Abducción de cadera en máquina', '🦵', 'reps', 1, 'Siéntate con la espalda apoyada y abre las piernas despacio, sin rebotar.', [3, 15, 60]),
+  L('Piernas y glúteos', 'Patada de glúteo en polea', '🍑', 'reps', 2, 'Con el tobillo en la polea, empuja la pierna hacia atrás sin arquear la espalda.', [3, 12, 60]),
+  L('Piernas y glúteos', 'Sentadilla frontal con barra', '🏋️', 'reps', 3, 'La barra descansa sobre los hombros por delante, codos arriba; baja con el torso erguido.', [4, 6, 120]),
+  L('Pecho', 'Flexiones', '🙌', 'reps', 1, 'Cuerpo en línea recta, baja el pecho hasta casi tocar el suelo y empuja sin hundir la cadera.', [3, 10, 60]),
+  L('Pecho', 'Aperturas con mancuernas', '🦅', 'reps', 2, 'Acostado, abre los brazos con los codos ligeramente flexionados y ciérralos como abrazando un árbol.', [3, 12, 75]),
+  L('Pecho', 'Cruce de poleas', '🔗', 'reps', 2, 'De pie, junta las manos al frente con los codos suaves y siente cómo se contrae el pecho.', [3, 12, 60]),
+  L('Pecho', 'Press declinado con mancuernas', '🏋️', 'reps', 3, 'En banco declinado, baja las mancuernas a los lados del pecho y empuja en línea.', [3, 10, 90]),
+  L('Espalda', 'Hiperextensiones', '🧗', 'reps', 1, 'Sube el torso hasta quedar en línea con las piernas, sin hiperextender la zona lumbar.', [3, 12, 60]),
+  L('Espalda', 'Jalón con agarre cerrado', '🧗', 'reps', 2, 'Tira de la barra hacia la parte alta del pecho con los codos pegados al cuerpo.', [3, 10, 75]),
+  L('Espalda', 'Pullover con mancuerna', '🧗', 'reps', 2, 'Acostado, lleva la mancuerna por encima de la cabeza y devuélvela con los codos suaves.', [3, 12, 75]),
+  L('Espalda', 'Remo unilateral en polea', '🔗', 'reps', 2, 'Tira del asa hacia la cadera con la espalda recta y sin girar el torso.', [3, 10, 75]),
+  L('Espalda', 'Remo T con barra', '🧗', 'reps', 3, 'Torso inclinado y espalda recta; lleva la barra hacia el abdomen apretando los omóplatos.', [3, 8, 90]),
+  L('Hombros', 'Elevaciones frontales con mancuernas', '🤸', 'reps', 1, 'Sube una mancuerna al frente hasta la altura de los hombros y baja despacio.', [3, 12, 60]),
+  L('Hombros', 'Encogimientos de hombros', '🤷', 'reps', 1, 'Sostén las mancuernas a los lados y sube los hombros hacia las orejas, con pausa arriba.', [3, 15, 60]),
+  L('Hombros', 'Pájaros con mancuernas', '🕊️', 'reps', 2, 'Inclinado hacia delante, abre los brazos hacia los lados para trabajar la parte posterior del hombro.', [3, 12, 60]),
+  L('Hombros', 'Press Arnold', '🤸', 'reps', 2, 'Empieza con las palmas hacia ti y gira las muñecas mientras empujas hacia arriba.', [3, 10, 75]),
+  L('Brazos', 'Curl en polea', '💪', 'reps', 1, 'Codos pegados al cuerpo; sube el agarre hasta los hombros y baja sin soltar la tensión.', [3, 12, 60]),
+  L('Brazos', 'Patada de tríceps', '💪', 'reps', 1, 'Torso inclinado, codo pegado al costado; extiende el brazo hacia atrás y vuelve.', [3, 12, 60]),
+  L('Brazos', 'Curl concentrado', '💪', 'reps', 2, 'Sentado, apoya el codo en la cara interna del muslo y sube la mancuerna sin balancear.', [3, 10, 60]),
+  L('Brazos', 'Extensión de tríceps sobre la cabeza', '💪', 'reps', 2, 'Sostén una mancuerna con ambas manos sobre la cabeza y baja detrás, con los codos apuntando arriba.', [3, 10, 60]),
+  L('Brazos', 'Press francés', '💪', 'reps', 2, 'Acostado, baja la barra hacia la frente doblando solo los codos y extiende.', [3, 10, 75]),
+  L('Abdomen', 'Tijeras abdominales', '✂️', 'time', 1, 'Acostado con la zona lumbar pegada al suelo, cruza las piernas arriba y abajo con control.', [3, 30, 45]),
+  L('Abdomen', 'Giros rusos', '🔄', 'reps', 2, 'Sentado con el torso inclinado, gira de lado a lado llevando las manos o una pesa.', [3, 16, 45]),
+  L('Abdomen', 'Plancha con toque de hombro', '🔥', 'reps', 2, 'En plancha alta, toca un hombro con la mano contraria sin balancear la cadera.', [3, 12, 45]),
+  L('Abdomen', 'Crunch en polea', '🔥', 'reps', 2, 'De rodillas, lleva los codos hacia las rodillas enrollando el torso, no tirando con los brazos.', [3, 12, 60]),
+  L('Cardio', 'Saltar la cuerda', '🪢', 'time', 1, 'Saltos pequeños con las muñecas, aterrizando suave sobre la punta de los pies.', [3, 60, 45]),
+  L('Cardio', 'Escaladora (stair climber)', '🪜', 'time', 1, 'Pasos firmes, torso erguido y sin apoyarte pesado en las barras.', [1, 600, 0]),
+  L('Cardio', 'Remo en ergómetro', '🚣', 'time', 1, 'Empuja con las piernas, luego inclina el torso y termina tirando con los brazos.', [1, 600, 0]),
+  L('Cardio', 'Cuerda de batalla', '🌊', 'time', 2, 'Rodillas ligeramente flexionadas; haz olas alternas con los brazos a ritmo constante.', [4, 30, 45]),
+  L('Cuerpo completo', 'Slam con balón medicinal', '🏀', 'reps', 2, 'Sube el balón sobre la cabeza y lánzalo al suelo con fuerza usando todo el cuerpo.', [3, 10, 60]),
+  L('Cuerpo completo', 'Clean con mancuernas', '⚡', 'reps', 3, 'Con una explosión de cadera, sube las mancuernas a los hombros y recíbelas con las rodillas flexionadas.', [3, 6, 90])
 ];
 var BY = {};
 LIB.forEach(function (l) { BY[l.n] = l; });
@@ -224,7 +257,31 @@ var PHRASES = [
   'Hoy gana quien aparece.',
   'Un poco de esfuerzo diario supera mucho esfuerzo ocasional.',
   'Confía en el proceso, tu cuerpo ya está cambiando.',
-  'Hazlo por ti, hazlo con ganas, hazlo hoy.'
+  'Hazlo por ti, hazlo con ganas, hazlo hoy.',
+  'Los grandes cambios empiezan con decisiones pequeñas.',
+  'Respira hondo: hoy solo necesitas dar el siguiente paso.',
+  'No compitas con nadie; supera al tú de ayer.',
+  'El descanso también es parte del camino.',
+  'Cada día es una página en blanco; escribe algo del que te sientas orgulloso.',
+  'Lo que haces cada día pesa más que lo que haces de vez en cuando.',
+  'Sé amable contigo: estás aprendiendo.',
+  'Un mal día no borra todo lo que ya has logrado.',
+  'Tu futuro se construye con lo que haces hoy.',
+  'La disciplina es recordar lo que quieres.',
+  'Ni la lluvia detiene a quien tiene un propósito.',
+  'Pequeños pasos, grandes destinos.',
+  'Agradece lo que ya puedes hacer y mejora lo que viene.',
+  'Tomarte un respiro no es rendirte.',
+  'Sonríe: tu mente también entrena.',
+  'Las excusas no cansan, pero tampoco te llevan lejos.',
+  'Lo difícil de hoy será tu fortaleza de mañana.',
+  'Aprende, cae, levántate y vuelve a intentarlo.',
+  'La paciencia también es una forma de avanzar.',
+  'Rodéate de quien te impulse y sé ese impulso para otros.',
+  'Cuida tu mente, tu sueño y tu agua: todo suma.',
+  'No necesitas verlo todo claro, solo empezar.',
+  'Cree en ti aunque nadie lo haga todavía.',
+  'Lo importante no es la velocidad, es no parar.'
 ];
 function phraseOf(d) {
   var day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000);
@@ -424,7 +481,30 @@ var LIB = [
   L('Cuerpo completo', 'Oso caminando', '🐻', 'time', 1, HP, 'En cuatro apoyos con las rodillas apenas despegadas, avanza con brazo y pierna contrarios.', [3, 30, 45], 'Hombros, core y piernas'),
   L('Cuerpo completo', 'Burpees', '🔄', 'reps', 2, HP, 'Baja al suelo, empuja con el pecho, vuelve a ponerte de pie y salta. Mantén la técnica aunque te canses.', [3, 8, 60], 'Piernas, pecho, hombros y core'),
   L('Cuerpo completo', 'Plancha con descenso (up-down)', '⬆️', 'reps', 2, HP, 'De plancha en antebrazos sube a plancha alta y baja, alternando el brazo que empieza.', [3, 8, 45], 'Hombros, tríceps y core'),
-  L('Cuerpo completo', 'Burpee con flexión', '🔥', 'reps', 3, HP, 'Burpee completo con una flexión en el suelo antes de volver a levantarte y saltar.', [4, 8, 75], 'Todo el cuerpo')
+  L('Cuerpo completo', 'Burpee con flexión', '🔥', 'reps', 3, HP, 'Burpee completo con una flexión en el suelo antes de volver a levantarte y saltar.', [4, 8, 75], 'Todo el cuerpo'),
+  L('Piernas y glúteos', 'Sentadilla sumo', '🦵', 'reps', 1, HP, 'Pies muy abiertos y puntas hacia afuera; baja con el torso erguido y sube apretando glúteos.', [3, 12, 45], 'Aductores, glúteos y cuádriceps'),
+  L('Piernas y glúteos', 'Zancada lateral', '↔️', 'reps', 1, HP, 'Da un paso largo hacia un lado, flexiona esa rodilla y mantén la otra pierna estirada.', [3, 10, 45], 'Glúteos, aductores y cuádriceps'),
+  L('Piernas y glúteos', 'Sentadilla cosaca', '🧘', 'reps', 2, HP, 'Baja hacia un lado con la otra pierna estirada y el talón apoyado; alterna sin prisa.', [3, 8, 60], 'Aductores, glúteos y cuádriceps'),
+  L('Piernas y glúteos', 'Subida al banco (step-up)', '🪜', 'reps', 1, P, 'Sube a un banco firme empujando con el talón y baja con control; alterna las piernas.', [3, 10, 45], 'Glúteos y cuádriceps'),
+  L('Piernas y glúteos', 'Puente de glúteo con marcha', '🍑', 'reps', 2, H, 'En puente, levanta una rodilla y luego la otra sin que la cadera baje ni gire.', [3, 16, 45], 'Glúteos y core'),
+  L('Empuje', 'Flexiones con toque de hombro', '🙌', 'reps', 2, HP, 'En posición de flexión alta, toca el hombro contrario con la mano sin mover la cadera.', [3, 10, 45], 'Pecho, hombros y core'),
+  L('Empuje', 'Flexiones hindúes', '🌀', 'reps', 2, HP, 'Desde pica, desliza el pecho hacia delante y arriba y vuelve; movimiento fluido.', [3, 8, 60], 'Hombros, pecho y tríceps'),
+  L('Empuje', 'Flexión con rotación en T', '🅣', 'reps', 2, HP, 'Tras cada flexión, gira el torso y lleva un brazo al techo formando una T.', [3, 8, 60], 'Pecho, hombros y core'),
+  L('Empuje', 'Flexiones con palmada', '👏', 'reps', 3, HP, 'Empuja con fuerza para despegar las manos del suelo, aplaude y recibe con codos suaves.', [3, 5, 75], 'Pecho, tríceps y potencia'),
+  L('Tirón', 'Remo con toalla en la puerta', '🚪', 'reps', 1, H, 'Agarra una toalla atada a una puerta firme, inclina el cuerpo atrás y tira hacia ti. Usa una puerta que no se abra.', [3, 10, 60], 'Espalda y bíceps'),
+  L('Tirón', 'Reverse snow angel', '😇', 'time', 1, HP, 'Boca abajo, abre y cierra los brazos pegados al suelo, con el pecho ligeramente elevado.', [3, 30, 45], 'Espalda alta y hombros'),
+  L('Tirón', 'Dominadas con agarre supino (chin-up)', '🧗', 'reps', 3, P, 'Palmas hacia ti, sube hasta pasar la barbilla y baja controlando.', [3, 5, 90], 'Dorsales y bíceps'),
+  L('Hombros', 'Elevación en Y acostado', '🙆', 'time', 1, HP, 'Boca abajo, lleva los brazos formando una Y y mantén los hombros alejados de las orejas.', [3, 30, 45], 'Hombros y espalda alta'),
+  L('Hombros', 'Pica con toque de hombro', '🔺', 'reps', 2, HP, 'En posición de pica con la cadera alta, toca un hombro con la mano contraria y alterna.', [3, 10, 45], 'Hombros y core'),
+  L('Core', 'Bicicleta abdominal', '🚲', 'reps', 1, HP, 'Acostado, lleva el codo hacia la rodilla contraria alternando, sin tirar del cuello.', [3, 16, 45], 'Abdomen y oblicuos'),
+  L('Core', 'Tijeras abdominales', '✂️', 'time', 1, HP, 'Con la zona lumbar pegada al suelo, cruza las piernas arriba y abajo con control.', [3, 30, 45], 'Abdomen bajo'),
+  L('Core', 'Giros rusos sin peso', '🔄', 'reps', 1, HP, 'Sentado con el torso inclinado y los pies sobre el suelo, gira de lado a lado.', [3, 16, 45], 'Oblicuos'),
+  L('Core', 'Plancha alta con toque de rodilla', '🔥', 'reps', 2, HP, 'En plancha alta, lleva una rodilla al codo del mismo lado y alterna.', [3, 12, 45], 'Core y hombros'),
+  L('Core', 'Plancha con elevación de pierna', '🔥', 'reps', 2, HP, 'En plancha, sube una pierna estirada sin girar la cadera y alterna.', [3, 10, 45], 'Core y glúteos'),
+  L('Cardio', 'Sombra de boxeo', '🥊', 'time', 1, HP, 'Pies ligeros y rodillas suaves; lanza golpes rectos y ganchos al aire a ritmo constante.', [3, 60, 45], ''),
+  L('Cardio', 'Salto del esquiador', '⛷️', 'time', 2, HP, 'Salta de lado a lado aterrizando sobre una pierna y balanceando los brazos.', [3, 30, 45], ''),
+  L('Cuerpo completo', 'Cangrejo caminando', '🦀', 'time', 1, HP, 'Sentado, apoya manos y pies, levanta la cadera y camina hacia delante y atrás.', [3, 30, 45], 'Tríceps, glúteos y core'),
+  L('Cuerpo completo', 'Salto de rana', '🐸', 'reps', 2, HP, 'Baja en sentadilla profunda con las manos al suelo y salta hacia delante; vuelve caminando.', [3, 8, 60], 'Piernas y core')
 ];
 var BY = {};
 LIB.forEach(function (l) { BY[l.n] = l; });
@@ -2143,6 +2223,7 @@ function renderPro() {
   h += '<h3>📈 Minutos por día</h3>' + barChart(items, 'Minutos entrenados por día. ' + parts.join('; ')) +
     '<div class="legend"><span><i class="dot done"></i>Minutos entrenados</span><span><i class="dot missed"></i>Día que no pudiste entrenar (marca ×)</span></div></div>';
   h += V.proExtras();
+  if (V.historyCard) h += V.historyCard();
 
   var cur = U.mondayOf(t), wk = [], wparts = [];
   for (var i = 7; i >= 0; i--) {
@@ -2230,7 +2311,8 @@ function renderPer() {
   var h = '<div class="card"><h2>🎯 Mi propósito</h2><label class="field"><span class="label">¿Por qué quieres entrenar?</span>' +
     '<textarea id="purposeIn" maxlength="140" placeholder="' + esc(D.T.ph) + '">' + esc(s.purpose) + '</textarea></label>' +
     '<div><button type="button" class="btn primary" data-act="savepurpose">Guardar propósito</button></div></div>';
-  h += '<div class="card"><h3>🎨 Apariencia</h3><p class="muted small">Elige claro, oscuro o que siga el modo de tu celular.</p>' + themeButtons(ST.getTheme()) + '<p class="muted small sec-hint"><span class="secdot" aria-hidden="true">' + (PS.s.getSection() === 'cali' ? '🏋️' : '🤸') + '</span> Para pasar a ' + (PS.s.getSection() === 'cali' ? 'Gimnasio' : 'Calistenia') + ' toca el botón redondo de arriba, junto al tema. Cada una guarda sus datos por separado.</p></div>';
+  h += '<div class="card"><h3>🎨 Apariencia</h3><p class="muted small">Elige claro, oscuro o que siga el modo de tu celular.</p>' + themeButtons(ST.getTheme()) + '<p class="muted small sec-hint"><span class="secdot" aria-hidden="true">' + (PS.s.getSection() === 'cali' ? '🏋️' : '🤸') + '</span> Para pasar a ' + (PS.s.getSection() === 'cali' ? 'Gimnasio' : 'Calistenia') + ' toca el botón redondo de arriba, junto al tema. Cada una guarda sus datos por separado.</p>' +
+    '<div class="rowflex"><button type="button" class="btn sm" data-act="introtoggle">✨ Animación de entrada: ' + (function () { try { return localStorage.getItem('primerset.intro') === '0' ? 'apagada' : 'activada'; } catch (e) { return 'activada'; } })() + '</button></div></div>';
   h += '<div class="card"><h2>📏 Mis datos</h2><div class="grid2">' +
     '<label class="field"><span class="label">Altura (cm)</span><input type="number" id="hIn" inputmode="decimal" min="100" max="230" value="' + esc(p.height) + '"></label>' +
     '<label class="field"><span class="label">Peso (kg)</span><input type="number" id="wIn" inputmode="decimal" min="30" max="250" step="0.1" value="' + esc(p.weight) + '"></label></div>' +
@@ -2304,29 +2386,35 @@ var U = PS.u, V = PS.v, $ = U.$, esc = U.esc;
    Términos y condiciones + Política de seguridad y privacidad.
    Se muestran una vez antes de entrar a la app y se pueden releer en Ajustes.
    ===================================================================== */
-var LEGAL_V = 1, LEGAL_DATE = '30 de octubre de 2026', LKEY = 'primerset.legal';
+var LEGAL_V = 2, LEGAL_DATE = '1 de noviembre de 2026', LKEY = 'primerset.legal';
 var mem = null;
 
 var DOCS = {
   tos: { e: '📜', name: 'Términos y condiciones', body: [
-    ['1. Qué es Primer Set', 'Primer Set es una aplicación gratuita para organizar y registrar tus rutinas de entrenamiento, con dos bloques: Gimnasio y Calistenia. Es una herramienta de apoyo personal; no es un servicio médico, de fisioterapia ni de entrenamiento personalizado.'],
-    ['2. Tu salud es lo primero', 'Las rutinas, los niveles, las progresiones, el IMC y las recomendaciones son orientativos y no sustituyen el consejo de un profesional de la salud. Antes de empezar, y sobre todo si tienes una condición médica, una lesión, dolor, estás embarazada o llevas tiempo sin entrenar, consulta a un médico. Detente si sientes dolor, mareo, falta de aire o malestar.'],
-    ['3. Riesgos del ejercicio', 'Entrenar implica riesgo de lesión. Haces los ejercicios bajo tu propia responsabilidad y a tu propio ritmo. En el bloque de Calistenia, revisa que las barras, bancos, mesas, sillas y el suelo del parque o de tu casa sean estables y seguros antes de usarlos.'],
-    ['4. Uso permitido', 'Puedes usar la app de forma personal. No la uses para fines ilegales ni intentes alterar su funcionamiento.'],
-    ['5. Sin garantías', 'La app se ofrece «tal cual», sin garantía de resultados físicos ni de funcionamiento continuo o libre de errores. Tus datos viven en tu dispositivo: si borras los datos del navegador o cambias de celular sin hacer una copia de seguridad, podrías perderlos.'],
-    ['6. Límite de responsabilidad', 'En la medida que permita la ley, quien creó la app no es responsable por lesiones, pérdidas de datos o daños derivados del uso de la app o de seguir sus recomendaciones.'],
-    ['7. Cambios', 'Estos términos pueden actualizarse. Si cambian de forma importante, la app te pedirá aceptarlos otra vez.']
+    ['1. Qué es Primer Set', 'Primer Set es una aplicación gratuita para organizar y registrar tus rutinas de entrenamiento, con dos bloques: Gimnasio y Calistenia. Es una herramienta de apoyo personal; no es un servicio médico, de fisioterapia, de nutrición ni de entrenamiento personalizado.'],
+    ['2. Aceptación', 'Al marcar la casilla y pulsar «Aceptar y entrar» confirmas que leíste estos términos y la política de seguridad y que estás de acuerdo. Si no estás de acuerdo, no uses la app.'],
+    ['3. Tu salud es lo primero', 'Las rutinas, los niveles, las progresiones, la prueba de nivel, las sugerencias de carga, el IMC y las recomendaciones son orientativos y no sustituyen el consejo de un profesional de la salud. Antes de empezar, y sobre todo si tienes una condición médica, una lesión, dolor, estás embarazada, tomas medicamentos o llevas tiempo sin entrenar, consulta a un médico. Detente de inmediato si sientes dolor, mareo, falta de aire, presión en el pecho o malestar, y busca atención médica si persiste.'],
+    ['4. Riesgos del ejercicio', 'Entrenar implica riesgo de lesión. Haces los ejercicios bajo tu propia responsabilidad y a tu propio ritmo, y decides cuánto peso y cuántas repeticiones hacer. En el bloque de Calistenia, revisa que las barras, bancos, mesas, sillas y el suelo del parque o de tu casa sean estables y seguros antes de usarlos, y evita entrenar solo con cargas altas sin supervisión.'],
+    ['5. Semana de descarga y sugerencias', 'Las sugerencias (subir peso, cambiar de ejercicio o hacer una semana de descarga) se calculan solo con lo que tú registras. Son una idea, no una orden: puedes ignorarlas.'],
+    ['6. Uso permitido', 'Puedes usar la app de forma personal. No la uses para fines ilegales, no intentes alterar su funcionamiento ni la presentes como un servicio médico.'],
+    ['7. Tus datos y copias de seguridad', 'Tus datos viven en tu dispositivo. Si borras los datos del navegador, desinstalas la app, cambias de celular o el sistema los elimina por inactividad, podrías perderlos. Haz copias de seguridad desde Ajustes con regularidad.'],
+    ['8. Sin garantías', 'La app se ofrece «tal cual», sin garantía de resultados físicos ni de funcionamiento continuo o libre de errores. Aunque se prueba con cuidado, pueden existir fallos.'],
+    ['9. Límite de responsabilidad', 'En la medida que permita la ley, quien creó la app no es responsable por lesiones, pérdidas de datos o daños derivados del uso de la app o de seguir sus recomendaciones. Esto no limita derechos que la ley no permita limitar.'],
+    ['10. Propiedad', 'El diseño, los textos y el código de la app pertenecen a su autor. Tus datos y tus registros son tuyos.'],
+    ['11. Cambios', 'Estos términos pueden actualizarse. Si cambian de forma importante, la app te pedirá aceptarlos otra vez.']
   ] },
   priv: { e: '🔒', name: 'Política de seguridad y privacidad', body: [
-    ['1. Qué datos guardamos', 'Lo que tú escribes: propósito, altura, peso, contextura, lugar de entrenamiento, rutina, registros de días, pesos y repeticiones, metas, medallas y logros. Gimnasio y Calistenia guardan sus datos por separado.'],
-    ['2. Dónde se guardan', 'Solo en tu dispositivo, en el almacenamiento del navegador. La app no tiene cuentas, anuncios, analíticas ni rastreadores, y no vende ni comparte tus datos.'],
+    ['1. Qué datos guardamos', 'Solo lo que tú escribes: propósito, altura, peso, contextura, lugar de entrenamiento, rutina, registros de días, pesos y repeticiones, metas, medallas, logros y tu elección de tema y bloque. Gimnasio y Calistenia guardan sus datos por separado.'],
+    ['2. Dónde se guardan', 'Solo en tu dispositivo, en el almacenamiento del navegador. La app no tiene cuentas, anuncios, analíticas ni rastreadores, y no vende ni comparte tus datos con nadie.'],
     ['3. Copia en la nube', 'Si abres la app dentro de Claude, tus datos también se guardan en tu cuenta de Claude para que no se pierdan. Fuera de Claude (GitHub Pages, app instalada o extensión) no se envía ningún dato de entrenamiento a ningún servidor.'],
-    ['4. Servicios externos', 'Al abrir la app con internet se cargan las fuentes de letra de Google Fonts. Google puede ver datos técnicos de la conexión, como tu dirección IP, pero no recibe tus datos de entrenamiento. Sin internet, la app usa las fuentes del sistema.'],
-    ['5. Datos de salud', 'Tu peso y tu altura son datos personales. Se usan solo dentro de la app para calcular el IMC y ajustar la rutina, y nunca salen de tu dispositivo (salvo la copia en la nube de Claude descrita arriba).'],
-    ['6. Cómo cuidar tus datos', 'Usa el bloqueo de pantalla de tu celular: quien tenga acceso a tu teléfono desbloqueado puede ver la app. Los archivos de copia de seguridad contienen todos tus datos, guárdalos en un lugar seguro.'],
-    ['7. Tu control', 'Puedes exportar tus datos, importarlos o borrarlos cuando quieras desde Ajustes → «Borrar todos mis datos». También se borran al limpiar los datos del navegador.'],
-    ['8. Menores de edad', 'La app está pensada para personas mayores de edad. Si eres menor, úsala con la guía de un adulto.'],
-    ['9. Cambios', 'Esta política puede actualizarse. Si cambia de forma importante, la app te lo mostrará antes de continuar.']
+    ['4. Servicios externos', 'Al abrir la app con internet se cargan las fuentes de letra de Google Fonts. Google puede ver datos técnicos de la conexión, como tu dirección IP y el tipo de navegador, pero no recibe tus datos de entrenamiento. Sin internet, la app usa las fuentes del sistema. La página se aloja en GitHub Pages, que puede registrar visitas técnicas según sus propias políticas.'],
+    ['5. Datos de salud', 'Tu peso y tu altura son datos personales sensibles. Se usan solo dentro de la app para calcular el IMC y ajustar la rutina, y nunca salen de tu dispositivo (salvo la copia en la nube de Claude descrita arriba). Puedes dejar en blanco lo que no quieras registrar.'],
+    ['6. Seguridad', 'La app no pide contraseñas ni datos de pago, y no ejecuta código de terceros. Aun así, ningún sistema es perfecto: usa el bloqueo de pantalla de tu celular, porque quien tenga acceso a tu teléfono desbloqueado puede ver la app. Los archivos de copia de seguridad contienen todos tus datos; guárdalos en un lugar seguro y no los compartas.'],
+    ['7. Tus derechos', 'Puedes ver, corregir, exportar, importar o borrar tus datos cuando quieras desde la propia app (Ajustes → «Borrar todos mis datos»). También se borran al limpiar los datos del navegador. Como los datos están solo en tu dispositivo, tú tienes el control total sobre ellos; esto va en línea con los derechos de conocer, actualizar, rectificar y suprimir tus datos personales que reconoce la normativa colombiana de protección de datos.'],
+    ['8. Cuánto tiempo se guardan', 'Mientras no los borres. La app no tiene copias propias, así que no puede recuperarlos si los eliminas.'],
+    ['9. Menores de edad', 'La app está pensada para personas mayores de edad. Si eres menor, úsala con la guía de un adulto responsable.'],
+    ['10. Contacto', 'Si encuentras un problema de seguridad o tienes dudas sobre esta política, escribe a quien te compartió la app para que lo corrija.'],
+    ['11. Cambios', 'Esta política puede actualizarse. Si cambia de forma importante, la app te lo mostrará antes de continuar.']
   ] }
 };
 
@@ -2533,6 +2621,59 @@ document.addEventListener('click', function (ev) {
 });
 document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape' && st.open) { st.open = false; render(); } });
 PS.v.levelTestBtn = btn;
+})();
+
+(function () {
+'use strict';
+var U = PS.u, ST = PS.s, V = PS.v, K = PS.k;
+var esc = U.esc;
+
+/* Historial de entrenamientos por mes (cada bloque tiene el suyo) */
+function monthKey(d) { return d.getFullYear() + '-' + U.pad(d.getMonth() + 1); }
+function monthLabel(mk) { var p = mk.split('-'); return K.MONTHS[+p[1] - 1] + ' de ' + p[0]; }
+function shift(mk, n) { var p = mk.split('-'), d = new Date(+p[0], +p[1] - 1 + n, 1); return monthKey(d); }
+function rows(mk) {
+  var logs = ST.get().logs, out = [];
+  Object.keys(logs).forEach(function (k) {
+    if (k.slice(0, 7) !== mk) return;
+    var l = logs[k];
+    if (l.status || (l.lifts && Object.keys(l.lifts).length)) out.push({ k: k, l: l });
+  });
+  out.sort(function (a, b) { return a.k < b.k ? 1 : -1; });
+  return out;
+}
+function liftTxt(v) { return (v.w ? ST.fmtNum(v.w) + ' kg' : '') + (v.w && v.r ? ' × ' : '') + (v.r ? v.r + ' rep.' : ''); }
+function historyCard() {
+  var ui = PS.ui, now = monthKey(V.today());
+  if (!ui.hmonth || !/^\d{4}-\d{2}$/.test(ui.hmonth)) ui.hmonth = now;
+  var mk = ui.hmonth, list = rows(mk), done = 0, mins = 0, missed = 0;
+  list.forEach(function (r) { if (r.l.status === 'done') { done++; mins += r.l.minutes || 0; } else if (r.l.status === 'missed') missed++; });
+  var h = '<div class="card hist"><div class="card-head"><div><span class="label">🗂️ Historial</span><h2>' + esc(monthLabel(mk)) + '</h2></div>' +
+    '<div class="rowflex"><button type="button" class="btn sm" data-act="hprev">‹</button><button type="button" class="btn sm" data-act="hnow"' + (mk === now ? ' disabled' : '') + '>Hoy</button><button type="button" class="btn sm" data-act="hnext"' + (mk >= now ? ' disabled' : '') + '>›</button></div></div>';
+  h += '<p class="muted small">' + done + ' sesión' + (done === 1 ? '' : 'es') + ' · ' + esc(U.fmtMin(mins)) + (missed ? ' · ' + missed + ' sin entrenar' : '') + '</p>';
+  if (!list.length) return h + '<p class="muted">Aún no hay registros este mes. Cuando marques tus días o anotes pesos, aparecerán aquí.</p></div>';
+  list.slice(0, 40).forEach(function (r) {
+    var d = U.parseKey(r.k), st = r.l.status;
+    var pill = st === 'done' ? '<span class="pill done">✅ ' + esc(U.fmtMin(r.l.minutes || 0)) + '</span>' : st === 'missed' ? '<span class="pill missed">❌ No entrenado</span>' : st === 'sick' ? '<span class="pill">🤒 Enfermedad</span>' : st === 'skip' ? '<span class="pill">⏭️ Saltado</span>' : '<span class="pill">📝 Anotado</span>';
+    var lifts = r.l.lifts ? Object.keys(r.l.lifts) : [];
+    h += '<div class="hist-row"><div class="hist-top"><b>' + esc(U.longDate(d)) + '</b>' + pill + '</div>';
+    if (lifts.length) h += '<ul class="hist-l">' + lifts.slice(0, 8).map(function (n) { return '<li>' + esc(n) + ': <b>' + esc(liftTxt(r.l.lifts[n])) + '</b></li>'; }).join('') + '</ul>';
+    h += '</div>';
+  });
+  if (list.length > 40) h += '<p class="muted small">Se muestran los 40 más recientes del mes.</p>';
+  return h + '</div>';
+}
+document.addEventListener('click', function (ev) {
+  var el = ev.target && ev.target.closest ? ev.target.closest('[data-act]') : null;
+  if (!el) return;
+  var a = el.getAttribute('data-act');
+  if (a !== 'hprev' && a !== 'hnext' && a !== 'hnow') return;
+  var ui = PS.ui, now = monthKey(V.today());
+  if (a === 'hnow') ui.hmonth = now;
+  else { var n = shift(ui.hmonth || now, a === 'hprev' ? -1 : 1); ui.hmonth = n > now ? now : n; }
+  V.renderPro();
+});
+V.historyCard = historyCard;
 })();
 
 (function () {
@@ -2914,6 +3055,10 @@ document.addEventListener('click', function (ev) {
     ui.confirmApply = false; applyPlan(); renderAll(); toast('✨ Tu rutina fue actualizada'); return;
   }
   if (a === 'applycancel') { ui.confirmApply = false; V.renderPer(); return; }
+  if (a === 'introtoggle') {
+    try { localStorage.setItem('primerset.intro', introOn() ? '0' : '1'); } catch (e) { /* ignorar */ }
+    V.renderPer(); toast(introOn() ? '✨ Animación de entrada activada' : 'Animación de entrada desactivada'); return;
+  }
   if (a === 'reset') {
     if (!ui.confirmReset) { ui.confirmReset = true; V.renderPer(); return; }
     ui.confirmReset = false; ui.step = 1; ui.mErr = ''; ST.reset(); V.legalReset(); renderAll(); V.showLegal(true, function () { V.renderModal(); }); return;
@@ -3053,6 +3198,25 @@ $('#picker').addEventListener('click', function (ev) {
 });
 
 /* ---------- Inicio ---------- */
+/* Animación de entrada: corta (1,3 s), se salta tocando y se puede apagar en Ajustes */
+function introOn() { try { return localStorage.getItem('primerset.intro') !== '0'; } catch (e) { return true; } }
+function playIntro(done) {
+  var el = $('#intro'), fin = false;
+  var reduce = false;
+  try { reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { /* ignorar */ }
+  var bot = false;
+  try { bot = navigator.webdriver === true; } catch (e) { /* ignorar */ }
+  if (!el || !introOn() || reduce || bot) { if (el) el.remove(); done(); return; }
+  document.documentElement.classList.add('intro-on');
+  function end() {
+    if (fin) return; fin = true;
+    el.classList.add('out'); document.documentElement.classList.remove('intro-on');
+    setTimeout(function () { if (el.parentNode) el.remove(); }, 380);
+    done();
+  }
+  el.addEventListener('click', end);
+  setTimeout(end, 1500);
+}
 function init() {
   ST.hooks.onRemote = function () {
     if (S().purpose && !$('#modal').hidden) V.closeModal();
@@ -3062,7 +3226,7 @@ function init() {
   renderAll();
   timerShow();
   var firstRun = function () { if (!S().purpose) { ui.step = 1; V.renderModal(); } };
-  if (V.legalNeeded()) V.showLegal(true, firstRun); else firstRun();
+  playIntro(function () { if (V.legalNeeded()) V.showLegal(true, firstRun); else firstRun(); });
   ST.initRemote();
   var lastDay = U.dkey(V.today());
   setInterval(function () {
