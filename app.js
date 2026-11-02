@@ -365,11 +365,43 @@ function planAdv(build) {
   return d;
 }
 
+/* Entrenar en casa: cambia máquinas y barra por mancuernas, peso corporal o banda */
+var GH = {
+  'Prensa de piernas': 'Sentadilla goblet con mancuerna', 'Extensión de piernas en máquina': 'Zancadas', 'Curl femoral en máquina': 'Peso muerto rumano con mancuernas',
+  'Sentadilla con barra': 'Sentadilla goblet con mancuerna', 'Sentadilla frontal con barra': 'Sentadilla goblet con mancuerna', 'Hip thrust con barra': 'Puente de glúteo',
+  'Peso muerto convencional': 'Peso muerto rumano con mancuernas', 'Abducción de cadera en máquina': 'Puente de glúteo', 'Patada de glúteo en polea': 'Puente de glúteo',
+  'Press de pecho en máquina': 'Flexiones', 'Press de banca con barra': 'Flexiones', 'Aperturas en máquina (pec deck)': 'Aperturas con mancuernas', 'Cruce de poleas': 'Aperturas con mancuernas',
+  'Press declinado con mancuernas': 'Press de pecho con mancuernas', 'Fondos en paralelas': 'Fondos en banco (tríceps)',
+  'Remo en máquina sentado': 'Remo con mancuerna', 'Jalón al pecho': 'Remo con mancuerna', 'Jalón con agarre cerrado': 'Remo con mancuerna', 'Remo en polea baja': 'Remo con mancuerna',
+  'Remo con barra': 'Remo con mancuerna', 'Remo T con barra': 'Remo con mancuerna', 'Remo unilateral en polea': 'Remo con mancuerna', 'Dominadas': 'Remo con mancuerna',
+  'Hiperextensiones': 'Bird dog', 'Press militar con barra': 'Press de hombros sentado', 'Face pull': 'Pájaros con mancuernas',
+  'Extensión de tríceps en polea': 'Extensión de tríceps sobre la cabeza', 'Curl con barra': 'Curl de bíceps con mancuernas', 'Curl en polea': 'Curl de bíceps con mancuernas',
+  'Press francés': 'Extensión de tríceps sobre la cabeza',
+  'Elevación de piernas colgado': 'Elevación de piernas acostado', 'Rueda abdominal': 'Plancha', 'Crunch en polea': 'Abdominales crunch',
+  'Caminata inclinada en cinta': 'Caminata suave', 'Bicicleta estática': 'Caminata suave', 'Elíptica': 'Caminata suave', 'Escaladora (stair climber)': 'Caminata suave',
+  'Remo en ergómetro': 'Caminata suave', 'Cuerda de batalla': 'Escaladores (mountain climbers)', 'Peso muerto con encogimiento y press': 'Peso muerto rumano con mancuernas',
+  'Slam con balón medicinal': 'Burpees', 'Swing con kettlebell': 'Sentadilla con press de hombros'
+};
+function homeify(days) {
+  days.forEach(function (d) {
+    var seen = {}, out = [];
+    d.ex.forEach(function (e) {
+      var m = GH[e.name], lib = m && D.libFind(m);
+      if (m && lib) {
+        e.name = lib.n;
+        if (lib.t !== e.type) { e.type = lib.t; if (lib.t === 'time') { e.secs = lib.d[1]; e.reps = 0; } else { e.reps = lib.d[1]; e.secs = 0; } }
+      }
+      if (seen[e.name]) return;
+      seen[e.name] = true; out.push(e);
+    });
+    d.ex = out;
+  });
+  return days;
+}
 function buildPlan(level, build) {
   var b = (build === 'delgada' || build === 'robusta') ? build : 'media';
-  if (level === 'avanzado') return planAdv(b);
-  if (level === 'intermedio') return planMid(b);
-  return planBeg(b);
+  var days = level === 'avanzado' ? planAdv(b) : level === 'intermedio' ? planMid(b) : planBeg(b);
+  return (D.ctx && D.ctx.gplace === 'casa') ? homeify(days) : days;
 }
 
 /* ---------- Recomendación por contextura ---------- */
@@ -394,7 +426,7 @@ function bmiAdvice(b) {
   return '';
 }
 
-D.LEVELS = LEVELS; D.levelOf = levelOf; D.buildPlan = buildPlan; D.REC = REC;
+D.GH = GH; D.LEVELS = LEVELS; D.levelOf = levelOf; D.buildPlan = buildPlan; D.REC = REC;
 D.bmi = bmi; D.bmiRange = bmiRange; D.bmiAdvice = bmiAdvice;
 })();
 
@@ -815,7 +847,7 @@ var K = PS.k, U = PS.u, D = PS.d;
 /* ---------- Estado ---------- */
 function defState() {
   return {
-    v: 1, updatedAt: 0, purpose: '', level: 'principiante', duration: 0, place: 'casa',
+    v: 1, updatedAt: 0, purpose: '', level: 'principiante', duration: 0, place: 'casa', gplace: 'gimnasio',
     profile: { height: '', weight: '', build: 'media' },
     routine: { days: D.buildPlan('principiante', 'media') },
     logs: {},
@@ -889,6 +921,7 @@ function norm(o) {
   s.purpose = typeof o.purpose === 'string' ? o.purpose.slice(0, 140) : '';
   s.level = (o.level === 'intermedio' || o.level === 'avanzado') ? o.level : 'principiante';
   s.place = o.place === 'parque' ? 'parque' : 'casa';
+  s.gplace = o.gplace === 'casa' ? 'casa' : 'gimnasio';
   s.duration = (+o.duration >= 15 && +o.duration <= 180) ? Math.round(+o.duration) : 0;
   if (o.profile && typeof o.profile === 'object') {
     s.profile.height = o.profile.height === '' || o.profile.height == null ? '' : +o.profile.height || '';
@@ -928,6 +961,9 @@ function norm(o) {
         checks: Array.isArray(l.checks) ? l.checks.filter(function (x) { return typeof x === 'string'; }).slice(0, 80) : [],
         lifts: normLifts(l.lifts)
       };
+      /* Ahorra almacenamiento: no guarda días vacíos */
+      var e = s.logs[k];
+      if (!e.status && !e.minutes && !e.checks.length && !Object.keys(e.lifts).length) delete s.logs[k];
     });
   }
   normExtras(o, s);
@@ -952,7 +988,7 @@ function loadSec(sec) {
 }
 var S = loadSec(SEC);
 /* El lugar de entreno (casa/parque) lo usa el generador de rutinas de Calistenia */
-function syncCtx() { D.ctx.place = S.place === 'parque' ? 'parque' : 'casa'; }
+function syncCtx() { D.ctx.place = S.place === 'parque' ? 'parque' : 'casa'; D.ctx.gplace = S.gplace === 'casa' ? 'casa' : 'gimnasio'; }
 syncCtx();
 
 var hooks = { onRemote: function () {} };
@@ -2210,10 +2246,10 @@ function renderPro() {
   var h = '<div class="card"><div class="card-head"><div><span class="label">📊 Semana</span><h2>' + esc(range) + '</h2></div>' +
     '<div class="rowflex"><button type="button" class="btn sm" data-act="wprev">Anterior</button><button type="button" class="btn sm" data-act="wnow">Esta semana</button><button type="button" class="btn sm" data-act="wnext">Siguiente</button></div></div>';
   h += '<div class="tiles">' +
-    '<div class="tile"><span class="label">🏋️ Sesiones</span><b>' + ws.done + ' / ' + ws.planned + '</b></div>' +
-    '<div class="tile"><span class="label">⏱️ Tiempo entrenado</span><b>' + esc(U.fmtMin(ws.minutes)) + '</b></div>' +
-    '<div class="tile"><span class="label">🔥 Racha</span><b>' + ST.streak(t) + ' d</b></div>' +
-    '<div class="tile"><span class="label">🎯 Cumplimiento 4 semanas</span><b>' + ST.adherence(t) + '%</b></div></div>';
+    '<div class="tile"><span class="ti" aria-hidden="true">🏋️</span><div class="tb"><b>' + ws.done + ' / ' + ws.planned + '</b><span class="label">Sesiones</span></div></div>' +
+    '<div class="tile"><span class="ti" aria-hidden="true">⏱️</span><div class="tb"><b>' + esc(U.fmtMin(ws.minutes)) + '</b><span class="label">Tiempo entrenado</span></div></div>' +
+    '<div class="tile"><span class="ti" aria-hidden="true">🔥</span><div class="tb"><b>' + ST.streak(t) + ' d</b><span class="label">Racha</span></div></div>' +
+    '<div class="tile"><span class="ti" aria-hidden="true">🎯</span><div class="tb"><b>' + ST.adherence(t) + '%</b><span class="label">Cumplimiento (4 sem.)</span></div></div></div>';
   var items = [], parts = [];
   ws.days.forEach(function (d) {
     var miss = d.status === 'missed';
@@ -2272,6 +2308,13 @@ function recBlock(s) {
   h += '<p class="muted small">El IMC es solo una guía y no mide el músculo. Si tienes alguna condición de salud o dolor, consulta a un profesional antes de empezar.</p></div>';
   return h;
 }
+function gplaceButtons(act, cur) {
+  var h = '<div class="seg" role="group" aria-label="Lugar de entrenamiento">';
+  [['gimnasio', '🏋️ En el gimnasio'], ['casa', '🏠 En casa']].forEach(function (o) {
+    h += '<button type="button" class="btn" data-act="' + act + '" data-v="' + o[0] + '" aria-pressed="' + (cur === o[0]) + '">' + o[1] + '</button>';
+  });
+  return h + '</div>';
+}
 function placeButtons(act, cur) {
   var h = '<div class="seg" role="group" aria-label="Lugar de entrenamiento">';
   [['casa', '🏠 En casa'], ['parque', '🌳 En el parque']].forEach(function (o) {
@@ -2320,6 +2363,7 @@ function renderPer() {
     (ui.perErr ? '<p class="err" role="alert">' + esc(ui.perErr) + '</p>' : '') +
     '<div><button type="button" class="btn primary" data-act="calc">Guardar mis datos</button></div></div>';
   if (D.T.id === 'cali') h += '<div class="card"><h2>📍 ¿Dónde entrenas?</h2><p class="muted small">Tus entrenamientos se adaptan al lugar. En casa no necesitas barra ni parque; en el parque usamos barras y bancos. Puedes deshacerlo.</p>' + placeButtons('place', s.place) + '</div>';
+  if (D.T.id !== 'cali') h += '<div class="card"><h2>📍 ¿Dónde entrenas?</h2><p class="muted small">En casa cambiamos máquinas y barra por mancuernas, peso corporal y ejercicios sencillos. Puedes deshacerlo.</p>' + gplaceButtons('gplace', s.gplace) + '</div>';
   h += '<div class="card"><h2>🎚️ Mi nivel</h2><p class="muted small">Toca un nivel y tu rutina cambia al instante. Si no te gusta, puedes deshacerlo.</p>' + levelButtons('level', s.level) + PS.v.levelTestBtn() + '</div>';
   h += '<div class="card soft"><span class="label">✨ Tu rutina según tus datos</span>' + recBlock(s) + '<div class="rowflex">' +
     (ui.confirmApply
@@ -2360,6 +2404,7 @@ function renderModal() {
       '<div class="grid2"><label class="field"><span class="label">Altura (cm)</span><input type="number" id="mH" inputmode="decimal" min="100" max="230" value="' + esc(p.height) + '"></label>' +
       '<label class="field"><span class="label">Peso (kg)</span><input type="number" id="mW" inputmode="decimal" min="30" max="250" step="0.1" value="' + esc(p.weight) + '"></label></div>' +
       (D.T.id === 'cali' ? '<div class="stack"><span class="label">📍 ¿Dónde vas a entrenar?</span><span class="muted small">Tus entrenamientos serán de acuerdo a esta opción.</span>' + placeButtons('mplace', s.place) + '</div>' : '') +
+      (D.T.id !== 'cali' ? '<div class="stack"><span class="label">📍 ¿Dónde vas a entrenar?</span><span class="muted small">En casa usamos mancuernas y peso corporal; en el gimnasio, máquinas y barra.</span>' + gplaceButtons('mgplace', s.gplace) + '</div>' : '') +
       '<div class="stack"><span class="label">Contextura</span>' + buildButtons('mbuild', p.build) + '</div>' + err +
       '<div class="rowflex"><button type="button" class="btn primary" data-act="m2">Ver mi rutina</button><button type="button" class="btn ghost" data-act="mskip">Omitir por ahora</button><button type="button" class="btn ghost" data-act="mback">Atrás</button></div>';
   } else {
@@ -2678,6 +2723,191 @@ V.historyCard = historyCard;
 
 (function () {
 'use strict';
+var U = PS.u, D = PS.d, V = PS.v, $ = U.$;
+var esc = U.esc;
+
+/* =====================================================================
+   Guía de ejercicios: explicación + ilustración animada del movimiento.
+   Las figuras se dibujan con SVG (no hay fotos): dos poses por movimiento.
+   ===================================================================== */
+var ST0 = { head: [112, 28], neck: [112, 40], hip: [110, 76], k1: [110, 106], f1: [110, 135], e1: [112, 60], h1: [112, 80] };
+function P(o) { var r = {}; Object.keys(ST0).forEach(function (k) { r[k] = ST0[k]; }); Object.keys(o || {}).forEach(function (k) { r[k] = o[k]; }); return r; }
+var TPL = {
+  squat: { n: 'Sentadilla', a: P(), b: P({ head: [112, 55], neck: [106, 68], hip: [84, 102], k1: [120, 100], f1: [110, 135], e1: [122, 74], h1: [140, 72] }),
+    t: 'Rodillas en línea con los pies, talones apoyados y pecho arriba. No dejes que las rodillas se junten al subir.' },
+  lunge: { n: 'Zancada', a: P(), b: P({ head: [108, 50], neck: [104, 62], hip: [100, 94], k1: [134, 94], f1: [134, 135], k2: [78, 120], f2: [50, 135], e1: [104, 82], h1: [104, 98] }),
+    t: 'Torso erguido y paso largo. La rodilla de delante no pasa mucho la punta del pie y la de atrás baja sin golpear el suelo.' },
+  bridge: { n: 'Puente', a: { head: [30, 120], neck: [45, 122], hip: [100, 126], k1: [130, 96], f1: [150, 133], e1: [75, 130], h1: [100, 133] }, b: { head: [30, 120], neck: [45, 122], hip: [105, 96], k1: [135, 96], f1: [150, 133], e1: [75, 130], h1: [100, 133] },
+    t: 'Empuja con los talones y aprieta glúteos arriba. No arquees la zona lumbar.' },
+  hinge: { n: 'Bisagra de cadera', a: P(), b: P({ head: [144, 62], neck: [130, 66], hip: [82, 88], k1: [92, 112], f1: [100, 135], e1: [130, 92], h1: [128, 116] }),
+    t: 'Lleva la cadera hacia atrás con la espalda recta y rodillas suaves. La barra o las pesas viajan pegadas a las piernas.' },
+  push: { n: 'Empuje', a: { head: [166, 78], neck: [150, 88], hip: [92, 106], k1: [60, 118], f1: [30, 130], e1: [150, 111], h1: [150, 134] }, b: { head: [166, 108], neck: [150, 114], hip: [92, 121], k1: [60, 127], f1: [30, 132], e1: [128, 118], h1: [150, 134] },
+    t: 'Cuerpo en línea recta, abdomen firme y codos a unos 45° del tronco. Baja con control, sin hundir la cadera.' },
+  plank: { n: 'Plancha', a: { head: [168, 100], neck: [152, 106], hip: [95, 112], k1: [62, 120], f1: [30, 130], e1: [152, 128], h1: [168, 130] }, b: { head: [168, 97], neck: [152, 103], hip: [95, 106], k1: [62, 117], f1: [30, 130], e1: [152, 128], h1: [168, 130] },
+    t: 'Línea recta de cabeza a talones, glúteos y abdomen apretados. Respira sin bloquear el aire.' },
+  row: { n: 'Remo', a: P({ head: [144, 58], neck: [130, 64], hip: [84, 86], k1: [92, 112], f1: [88, 135], e1: [132, 90], h1: [132, 112] }), b: P({ head: [144, 58], neck: [130, 64], hip: [84, 86], k1: [92, 112], f1: [88, 135], e1: [106, 78], h1: [126, 88] }),
+    t: 'Espalda recta y mirada al frente. Junta los omóplatos al tirar y baja sin soltar la tensión.' },
+  pull: { n: 'Dominada / colgado', bar: true, a: { head: [112, 62], neck: [112, 74], hip: [112, 108], k1: [112, 124], f1: [100, 136], e1: [112, 48], h1: [112, 22] }, b: { head: [112, 24], neck: [112, 38], hip: [112, 72], k1: [112, 92], f1: [102, 112], e1: [128, 38], h1: [116, 22] },
+    t: 'Empieza con los hombros activos (no colgado "muerto"). Sube llevando el pecho a la barra y baja despacio.' },
+  press: { n: 'Press vertical', a: P({ e1: [126, 54], h1: [120, 34] }), b: P({ e1: [114, 22], h1: [114, 4] }),
+    t: 'Abdomen y glúteos firmes, sin arquear la espalda. Empuja en línea recta sobre la cabeza.' },
+  curl: { n: 'Curl / codos', a: P({ e1: [112, 62], h1: [112, 82] }), b: P({ e1: [112, 62], h1: [128, 44] }),
+    t: 'Codos pegados al cuerpo y sin balancear el torso. Controla la bajada.' },
+  raise: { n: 'Elevación', a: P({ e1: [112, 60], h1: [112, 80] }), b: P({ e1: [130, 46], h1: [152, 46] }),
+    t: 'Sube hasta la altura de los hombros, sin encogerlos ni usar impulso. Peso ligero y control.' },
+  crunch: { n: 'Abdominal', a: { head: [40, 118], neck: [55, 122], hip: [100, 126], k1: [130, 100], f1: [150, 133], e1: [50, 108], h1: [62, 100] }, b: { head: [78, 88], neck: [76, 100], hip: [100, 126], k1: [130, 100], f1: [150, 133], e1: [96, 92], h1: [110, 98] },
+    t: 'Zona lumbar pegada al suelo, mirada al techo y sin tirar del cuello. Sube con el abdomen, no con los brazos.' },
+  legs: { n: 'Elevación de piernas', a: { head: [30, 120], neck: [45, 122], hip: [100, 126], k1: [130, 128], f1: [160, 130], e1: [70, 130], h1: [100, 133] }, b: { head: [30, 120], neck: [45, 122], hip: [100, 126], k1: [102, 94], f1: [102, 62], e1: [70, 130], h1: [100, 133] },
+    t: 'Mantén la zona lumbar pegada al suelo. Si se arquea, flexiona un poco las rodillas.' },
+  calf: { n: 'Talones', a: P(), b: P({ head: [112, 20], neck: [112, 32], hip: [110, 68], k1: [110, 100], f1: [112, 127] }),
+    t: 'Sube lo más alto que puedas, pausa un segundo y baja lento. Apóyate en una pared si necesitas equilibrio.' },
+  run: { n: 'Cardio / salto', a: { head: [112, 28], neck: [110, 40], hip: [106, 76], k1: [128, 90], f1: [124, 114], k2: [92, 108], f2: [78, 128], e1: [128, 62], h1: [140, 48], e2: [94, 60], h2: [84, 76] }, b: { head: [112, 28], neck: [110, 40], hip: [106, 76], k1: [92, 90], f1: [96, 114], k2: [128, 108], f2: [140, 126], e1: [94, 62], h1: [84, 48], e2: [128, 60], h2: [140, 76] },
+    t: 'Aterriza suave sobre la punta del pie y mantén el ritmo. Baja la intensidad si te falta el aire.' }
+};
+var RULES = [
+  { r: /talones/, k: 'calf' }, { r: /dominada|colgarse|colgado|chin-up/, k: 'pull' },
+  { r: /elevación de piernas|tijeras/, k: 'legs' }, { r: /plancha|bird dog|hollow|dead bug|oso|cangrejo|rueda/, k: 'plank' },
+  { r: /crunch|abdominal|bicicleta|giros|v-ups|rusos/, k: 'crunch' },
+  { r: /puente|hip thrust|patada de glúteo|glúteo/, k: 'bridge' },
+  { r: /peso muerto|swing|hiperext|clean|buenos días/, k: 'hinge' },
+  { r: /zancada|búlgara|step|subida|cosaca/, k: 'lunge' },
+  { r: /sentadilla|prensa|goblet|pistol|extensión de piernas|curl femoral|curl nórdico|abducción/, k: 'squat' },
+  { r: /flexión|flexiones|fondos|press de pecho|press de banca|press inclinado|press declinado|aperturas|cruce|pec deck|pullover/, k: 'push' },
+  { r: /pica|parada de manos|press|arnold|militar|thruster|elevación en y/, k: 'press' },
+  { r: /remo|jalón|face pull|pájaros|superman|snow angel/, k: 'row' },
+  { r: /curl|tríceps|francés/, k: 'curl' },
+  { r: /elevaciones|elevación|encogimiento/, k: 'raise' },
+  { r: /burpee|salto|saltar|jumping|rodillas altas|trote|caminata|escalador|patinador|sprint|gusano|boxeo|eslalon|esquiador|rana|remo en ergómetro|elíptica|bicicleta estática|cuerda de batalla|slam|granjero/, k: 'run' }
+];
+var GROUP_TPL = { 'Piernas y glúteos': 'squat', 'Pecho': 'push', 'Espalda': 'row', 'Hombros': 'press', 'Brazos': 'curl', 'Abdomen': 'crunch', 'Cardio': 'run', 'Cuerpo completo': 'run',
+  'Empuje': 'push', 'Tirón': 'row', 'Core': 'plank' };
+function tplOf(l) {
+  var n = l.n.toLowerCase();
+  for (var i = 0; i < RULES.length; i++) { if (RULES[i].r.test(n)) return RULES[i].k; }
+  return GROUP_TPL[l.g] || 'run';
+}
+function pt(p) { return p[0] + ' ' + p[1]; }
+function limbs(o) {
+  var sh = o.neck, far = function (a, b) { return [a[0] + b, a[1]]; };
+  var k2 = o.k2 || far(o.k1, -7), f2 = o.f2 || far(o.f1, -7), e2 = o.e2 || far(o.e1, -6), h2 = o.h2 || far(o.h1, -6);
+  return {
+    torso: [o.neck, o.hip],
+    leg1: [o.hip, o.k1, o.f1], leg2: [o.hip, k2, f2],
+    arm1: [sh, o.e1, o.h1], arm2: [sh, e2, h2]
+  };
+}
+function dOf(pts) { return 'M' + pts.map(pt).join(' L'); }
+function flat(pts) { var r = []; pts.forEach(function (p) { r.push(p[0], p[1]); }); return r.join(','); }
+function figure(key) {
+  var t = TPL[key] || TPL.run, A = limbs(t.a), B = limbs(t.b);
+  var lim = function (id, op) { return '<path d="' + dOf(A[id]) + '" opacity="' + op + '" data-a="' + flat(A[id]) + '" data-b="' + flat(B[id]) + '"/>'; };
+  return '<svg class="gi-svg" viewBox="0 0 220 150" role="img" aria-label="Ilustración del movimiento: ' + esc(t.n) + '">' +
+    '<line x1="8" y1="137" x2="212" y2="137" class="gi-ground"/>' + (t.bar ? '<line x1="70" y1="20" x2="154" y2="20" class="gi-bar"/>' : '') +
+    '<g class="gi-fig" fill="none" stroke-linecap="round" stroke-linejoin="round">' + lim('leg2', .5) + lim('arm2', .5) + lim('torso', 1) + lim('leg1', 1) + lim('arm1', 1) +
+    '<circle r="9" class="gi-head" cx="' + t.a.head[0] + '" cy="' + t.a.head[1] + '" data-a="' + t.a.head.join(',') + '" data-b="' + t.b.head.join(',') + '"/></g></svg>';
+}
+/* Animación ligera (un solo bucle, solo mientras haya una figura abierta a la vista) */
+var live = [], raf = 0, reduce = false;
+try { reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { /* ignorar */ }
+function num(a) { return a.split(',').map(Number); }
+function frame(now) {
+  raf = 0;
+  live = live.filter(function (sv) { var d = sv.closest ? sv.closest('details') : null; return sv.isConnected && d && d.open; });
+  if (!live.length) return;
+  var ph = (now % 2800) / 2800, k = (1 - Math.cos(ph * 2 * Math.PI)) / 2;
+  live.forEach(function (sv) {
+    var els = sv.querySelectorAll('[data-a]'), i, j, a, b, v;
+    for (i = 0; i < els.length; i++) {
+      a = num(els[i].getAttribute('data-a')); b = num(els[i].getAttribute('data-b')); v = [];
+      for (j = 0; j < a.length; j++) v.push(a[j] + (b[j] - a[j]) * k);
+      if (els[i].tagName === 'circle') { els[i].setAttribute('cx', v[0].toFixed(1)); els[i].setAttribute('cy', v[1].toFixed(1)); }
+      else {
+        var pts = [];
+        for (j = 0; j < v.length; j += 2) pts.push(v[j].toFixed(1) + ' ' + v[j + 1].toFixed(1));
+        els[i].setAttribute('d', 'M' + pts.join(' L'));
+      }
+    }
+  });
+  raf = requestAnimationFrame(frame);
+}
+function play(sv) {
+  if (reduce || !sv) return;
+  if (live.indexOf(sv) < 0) live.push(sv);
+  if (!raf) raf = requestAnimationFrame(frame);
+}
+function lvName(n) { return D.LV_INFO[n] || ''; }
+
+/* ---------- Vista ---------- */
+var ui = { g: '', q: '' };
+function sectionIsHome(l) {
+  if (D.T.id === 'cali') { var t = l.tip || ''; return { home: /🏠/.test(t.slice(0, 6)), park: /🌳/.test(t.slice(0, 6)) }; }
+  return { home: !(D.GH && D.GH[l.n]), park: false };
+}
+function cleanTip(l) { return String(l.tip || '').replace(/^(🏠🌳|🏠|🌳)\s*/, ''); }
+function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
+function listHtml() {
+  var q = norm(ui.q), g = ui.g, out = [];
+  D.LIB.forEach(function (l) {
+    if (g && l.g !== g) return;
+    if (q && norm(l.n).indexOf(q) < 0 && norm(l.g).indexOf(q) < 0 && norm(l.m).indexOf(q) < 0) return;
+    out.push(l);
+  });
+  if (!out.length) return '<p class="muted">No encontré ejercicios con esa búsqueda.</p>';
+  var h = '<p class="muted small">' + out.length + ' ejercicio' + (out.length === 1 ? '' : 's') + '</p>';
+  out.slice(0, 60).forEach(function (l) {
+    var dose = D.libDose ? D.libDose(l) : '';
+    h += '<details class="gx" data-ex="' + esc(l.n) + '"><summary><span class="ex-emoji" aria-hidden="true">' + l.e + '</span><span class="gx-t"><b>' + esc(l.n) + '</b><span class="muted small">' + esc(l.g) + (dose ? ' · ' + esc(dose) : '') + '</span></span></summary><div class="gx-b"></div></details>';
+  });
+  if (out.length > 60) h += '<p class="muted small">Se muestran 60. Usa el buscador o un grupo para ver los demás.</p>';
+  return h;
+}
+function render() {
+  var h = '<div class="card"><h2>📚 Guía de ejercicios</h2><p class="muted small">Toca un ejercicio para ver la ilustración del movimiento, cómo hacerlo y qué cuidar. Las figuras son ilustraciones del movimiento base.</p>' +
+    '<label class="field"><span class="label">🔎 Buscar</span><input type="search" id="gSearch" placeholder="Ej: sentadilla, pecho, plancha" value="' + esc(ui.q) + '" autocomplete="off" maxlength="40"></label>' +
+    '<div class="pk-chips" role="group" aria-label="Grupo muscular"><button type="button" class="chip" data-act="gfil" data-v="" aria-pressed="' + (!ui.g) + '">Todos</button>';
+  D.GROUPS.forEach(function (g) { h += '<button type="button" class="chip" data-act="gfil" data-v="' + esc(g) + '" aria-pressed="' + (ui.g === g) + '">' + (D.GROUP_EMOJI[g] || '') + ' ' + esc(g) + '</button>'; });
+  h += '</div></div><div class="card" id="gList">' + listHtml() + '</div>';
+  $('#v-gui').innerHTML = h;
+}
+function fill(det) {
+  var box = det.querySelector('.gx-b');
+  if (!box || box.getAttribute('data-ok')) return;
+  var l = D.libFind(det.getAttribute('data-ex'));
+  if (!l) return;
+  var key = tplOf(l), t = TPL[key] || TPL.run, pl = sectionIsHome(l);
+  box.setAttribute('data-ok', '1');
+  box.innerHTML = '<div class="gi">' + figure(key) + '</div>' +
+    '<div class="rowflex"><span class="pill">' + esc(lvName(l.lv)) + '</span>' +
+    (pl.home ? '<span class="pill">🏠 Casa</span>' : '') + (pl.park ? '<span class="pill">🌳 Parque</span>' : '') +
+    (D.T.id !== 'cali' ? '<span class="pill">' + (pl.home ? '🏋️ Gimnasio' : '🏋️ Solo gimnasio') + '</span>' : '') + '</div>' +
+    (l.m ? '<p><b>💥 Músculos:</b> ' + esc(l.m) + '</p>' : '') +
+    '<p><b>✅ Cómo hacerlo:</b> ' + esc(cleanTip(l)) + '</p>' +
+    '<p><b>⚠️ Cuida:</b> ' + esc(t.t) + '</p>' +
+    '<p class="muted small">Detente si sientes dolor agudo o mareo. Empieza con poco peso y aprende primero la técnica.</p>';
+}
+function start(det) { fill(det); play(det.querySelector('.gi-svg')); }
+document.addEventListener('toggle', function (ev) {
+  var d = ev.target;
+  if (d && d.classList && d.classList.contains('gx') && d.open) start(d);
+}, true);
+document.addEventListener('input', function (ev) {
+  if (!ev.target || ev.target.id !== 'gSearch') return;
+  ui.q = ev.target.value.slice(0, 40);
+  var l = $('#gList'); if (l) l.innerHTML = listHtml();
+});
+document.addEventListener('click', function (ev) {
+  var el = ev.target && ev.target.closest ? ev.target.closest('[data-act="gfil"]') : null;
+  if (!el) return;
+  ui.g = el.getAttribute('data-v') || '';
+  render();
+});
+V.renderGui = render;
+V.guiReset = function () { ui.g = ''; ui.q = ''; };
+D.illus = { tplOf: tplOf, figure: figure, TPL: TPL };
+})();
+
+(function () {
+'use strict';
 var U = PS.u, D = PS.d, ST = PS.s, V = PS.v;
 var $ = U.$, ui = PS.ui;
 function S() { return ST.get(); }
@@ -2701,13 +2931,14 @@ function toast(msg, act, ms) {
 }
 
 /* ---------- Dibujar solo la pestaña visible (más rápido) ---------- */
-var VIEWS = ['hoy', 'cal', 'rut', 'pro', 'per'];
-var VIEW_INFO = { hoy: ['🏠', 'Inicio'], cal: ['📅', 'Calendario'], rut: ['🏋️', 'Rutina'], pro: ['📊', 'Progreso'], per: ['⚙️', 'Ajustes'] };
+var VIEWS = ['hoy', 'cal', 'rut', 'pro', 'gui', 'per'];
+var VIEW_INFO = { hoy: ['🏠', 'Inicio'], cal: ['📅', 'Calendario'], rut: ['🏋️', 'Rutina'], pro: ['📊', 'Progreso'], gui: ['📚', 'Guía'], per: ['⚙️', 'Ajustes'] };
 function renderView(v) {
   if (v === 'hoy') V.renderHoy();
   else if (v === 'cal') V.renderCal();
   else if (v === 'rut') V.renderRut();
   else if (v === 'pro') V.renderPro();
+  else if (v === 'gui') V.renderGui();
   else V.renderPer();
 }
 function renderAll() {
@@ -2821,7 +3052,7 @@ function switchSection(sec) {
   T = TS[sec]; timerShow();
   $('#toast').hidden = true;
   if (!ST.setSection(sec)) return;
-  ui.resetSection();
+  ui.resetSection(); V.guiReset && V.guiReset();
   VIEWS.forEach(function (id) { $('#v-' + id).classList.toggle('on', id === 'hoy'); });
   paintSection();
   V.closePicker && V.closePicker();
@@ -3027,22 +3258,22 @@ document.addEventListener('click', function (ev) {
     if (!txt) { toast('Escribe tu propósito'); return; }
     s.purpose = txt; save(); V.renderHeader(); toast('🎯 Propósito guardado'); return;
   }
-  if (a === 'build' || a === 'level' || a === 'place') {
+  if (a === 'build' || a === 'level' || a === 'place' || a === 'gplace') {
     syncPer('hIn', 'wIn');
-    var curV = a === 'build' ? s.profile.build : a === 'place' ? s.place : s.level;
+    var curV = a === 'build' ? s.profile.build : a === 'place' ? s.place : a === 'gplace' ? s.gplace : s.level;
     if (v === curV) return;
     ui.perErr = ''; ui.confirmApply = false;
-    ui.undo = { level: s.level, build: s.profile.build, place: s.place, days: JSON.parse(JSON.stringify(s.routine.days)) };
-    if (a === 'build') s.profile.build = v; else if (a === 'place') { s.place = v; ST.syncCtx(); } else s.level = v;
+    ui.undo = { level: s.level, build: s.profile.build, place: s.place, gplace: s.gplace, days: JSON.parse(JSON.stringify(s.routine.days)) };
+    if (a === 'build') s.profile.build = v; else if (a === 'place') { s.place = v; ST.syncCtx(); } else if (a === 'gplace') { s.gplace = v === 'casa' ? 'casa' : 'gimnasio'; ST.syncCtx(); } else s.level = v;
     applyPlan(); renderAll();
     var lvN = D.levelOf(s.level);
-    toast(a === 'place' ? (v === 'parque' ? '🌳 Parque' : '🏠 Casa') + ': tu rutina se adaptó' : a === 'level' ? lvN.e + ' Nivel ' + lvN.name.toLowerCase() + ': tu rutina cambió' : '✅ Contextura ' + v + ': tu rutina se ajustó', ['undo', 'Deshacer']);
+    toast(a === 'gplace' ? (v === 'casa' ? '🏠 Casa' : '🏋️ Gimnasio') + ': tu rutina se adaptó' : a === 'place' ? (v === 'parque' ? '🌳 Parque' : '🏠 Casa') + ': tu rutina se adaptó' : a === 'level' ? lvN.e + ' Nivel ' + lvN.name.toLowerCase() + ': tu rutina cambió' : '✅ Contextura ' + v + ': tu rutina se ajustó', ['undo', 'Deshacer']);
     return;
   }
   if (a === 'undo') {
     var u = ui.undo;
     if (!u) return;
-    s.level = u.level; s.profile.build = u.build; if (u.place) { s.place = u.place; ST.syncCtx(); } s.routine.days = u.days; ui.undo = null;
+    s.level = u.level; s.profile.build = u.build; if (u.place) { s.place = u.place; } if (u.gplace) { s.gplace = u.gplace; } ST.syncCtx(); s.routine.days = u.days; ui.undo = null;
     save(); $('#toast').hidden = true; renderAll(); toast('↩️ Rutina anterior recuperada'); return;
   }
   if (a === 'calc') {
@@ -3076,6 +3307,7 @@ document.addEventListener('click', function (ev) {
   if (a === 'mdur') { s.duration = U.num(v, 0, 180, 0); save(); V.renderModal(); return; }
   if (a === 'm1b') { ui.mErr = ''; ui.step = 3; V.renderModal(); return; }
   if (a === 'mback') { ui.mErr = ''; ui.step = Math.max(1, ui.step - 1); V.renderModal(); return; }
+  if (a === 'mgplace') { syncPer('mH', 'mW'); s.gplace = v === 'casa' ? 'casa' : 'gimnasio'; ST.syncCtx(); ui.mErr = ''; save(); V.renderModal(); return; }
   if (a === 'mplace') { syncPer('mH', 'mW'); s.place = v; ST.syncCtx(); ui.mErr = ''; save(); V.renderModal(); return; }
   if (a === 'mbuild') { syncPer('mH', 'mW'); s.profile.build = v; ui.mErr = ''; save(); V.renderModal(); return; }
   if (a === 'm2') {

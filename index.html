@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'; worker-src 'self'; manifest-src 'self'">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Primer Set</title>
 <meta name="theme-color" content="#0E7C70">
@@ -23,6 +24,7 @@
     <section class="view" id="v-cal" aria-label="Calendario"></section>
     <section class="view" id="v-rut" aria-label="Mi rutina"></section>
     <section class="view" id="v-pro" aria-label="Progreso"></section>
+    <section class="view" id="v-gui" aria-label="Guía"></section>
     <section class="view" id="v-per" aria-label="Ajustes"></section>
   </main>
 </div>
@@ -36,6 +38,7 @@
     <button type="button" class="itm" data-act="tab" data-v="rut" tabindex="-1"><span class="e" aria-hidden="true">🏋️</span>Rutina</button>
     <button type="button" class="itm" data-act="tab" data-v="cal" tabindex="-1"><span class="e" aria-hidden="true">📅</span>Calendario</button>
     <button type="button" class="itm" data-act="tab" data-v="pro" tabindex="-1"><span class="e" aria-hidden="true">📊</span>Progreso</button>
+    <button type="button" class="itm" data-act="tab" data-v="gui" tabindex="-1"><span class="e" aria-hidden="true">📚</span>Guía</button>
     <button type="button" class="itm" data-act="tab" data-v="per" tabindex="-1"><span class="e" aria-hidden="true">⚙️</span>Ajustes</button>
   </div>
 </nav>
