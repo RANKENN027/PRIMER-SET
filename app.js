@@ -869,6 +869,7 @@ function normLifts(o) {
   var out = {};
   if (!o || typeof o !== 'object') return out;
   Object.keys(o).slice(0, 60).forEach(function (n) {
+    if (n === '__proto__' || n === 'constructor' || n === 'prototype') return;
     var v = o[n] || {};
     var w = numIn(v.w, 0, 1000, 0, true), r = numIn(v.r, 0, 1000, 0, false);
     if ((w || r) && n.length <= 80) out[n] = { w: w, r: r };
@@ -908,10 +909,10 @@ function normExtras(o, s) {
     }
   }
   if (o.sg && typeof o.sg === 'object') {
-    Object.keys(o.sg).slice(0, 80).forEach(function (k) { var d = dk(o.sg[k]); if (d && k.length <= 120) s.sg[k] = d; });
+    Object.keys(o.sg).slice(0, 80).forEach(function (k) { if (k === '__proto__' || k === 'constructor' || k === 'prototype') return; var d = dk(o.sg[k]); if (d && k.length <= 120) s.sg[k] = d; });
   }
   if (o.achv && typeof o.achv === 'object') {
-    Object.keys(o.achv).slice(0, 40).forEach(function (k) { var d = dk(o.achv[k]); if (d && k.length <= 30) s.achv[k] = d; });
+    Object.keys(o.achv).slice(0, 40).forEach(function (k) { if (k === '__proto__' || k === 'constructor' || k === 'prototype') return; var d = dk(o.achv[k]); if (d && k.length <= 30) s.achv[k] = d; });
   }
 }
 function norm(o) {
@@ -2730,111 +2731,188 @@ var esc = U.esc;
    Guía de ejercicios: explicación + ilustración animada del movimiento.
    Las figuras se dibujan con SVG (no hay fotos): dos poses por movimiento.
    ===================================================================== */
-var ST0 = { head: [112, 28], neck: [112, 40], hip: [110, 76], k1: [110, 106], f1: [110, 135], e1: [112, 60], h1: [112, 80] };
-function P(o) { var r = {}; Object.keys(ST0).forEach(function (k) { r[k] = ST0[k]; }); Object.keys(o || {}).forEach(function (k) { r[k] = o[k]; }); return r; }
+/* ---------- Muñeco articulado (vista lateral, mira a la derecha) ----------
+   Cada pose se define con ángulos de segmentos (0° = hacia abajo, 90° = adelante, 180° = arriba, -90° = atrás)
+   y las longitudes del cuerpo son siempre las mismas, para que el movimiento se vea real. */
+var LEN = { torso: 38, thigh: 32, shin: 32, ua: 21, fa: 20 };
+function pr(v) { return Array.isArray(v) ? v : [v, v]; }
+function F(x, t, th, sh, ua, fa, o) {
+  th = pr(th); sh = pr(sh); ua = pr(ua); fa = pr(fa); o = o || {};
+  return { x: x, t: t, th0: th[0], th1: th[1], sh0: sh[0], sh1: sh[1], ua0: ua[0], ua1: ua[1], fa0: fa[0], fa1: fa[1], sy: o.sy || 0, air: o.air || 0, hy: o.hy == null ? NaN : o.hy };
+}
+var KEYS = ['x', 't', 'th0', 'th1', 'sh0', 'sh1', 'ua0', 'ua1', 'fa0', 'fa1', 'sy', 'air', 'hy'];
+function lerp(a, b, k) { var r = {}; KEYS.forEach(function (n) { r[n] = (isNaN(a[n]) || isNaN(b[n])) ? a[n] : a[n] + (b[n] - a[n]) * k; }); return r; }
+function vec(a, l) { var r = a * Math.PI / 180; return [Math.sin(r) * l, Math.cos(r) * l]; }
+function add(p, v) { return [p[0] + v[0], p[1] + v[1]]; }
+function solve(p) {
+  var hip = [p.x, 0], tr = p.t * Math.PI / 180, up = [Math.sin(tr), -Math.cos(tr)];
+  var neck = [hip[0] + up[0] * LEN.torso, hip[1] + up[1] * LEN.torso], head = [neck[0] + up[0] * 13, neck[1] + up[1] * 13];
+  var sh = [neck[0], neck[1] + p.sy], r = { hip: hip, neck: neck, head: head, k: [], f: [], toe: [], e: [], h: [] }, i, kn, ft;
+  for (i = 0; i < 2; i++) {
+    kn = add(hip, vec(p['th' + i], LEN.thigh)); ft = add(kn, vec(p['sh' + i], LEN.shin));
+    var s = vec(p['sh' + i], 1);
+    r.k.push(kn); r.f.push(ft); r.toe.push([ft[0] + s[1] * 8, ft[1] - s[0] * 8]);
+    var el = add(sh, vec(p['ua' + i], LEN.ua)); r.e.push(el); r.h.push(add(el, vec(p['fa' + i], LEN.fa)));
+  }
+  r.sh = sh;
+  var all = [hip, head, r.k[0], r.k[1], r.f[0], r.f[1], r.toe[0], r.toe[1], r.h[0], r.h[1], neck], maxY = -1e9;
+  all.forEach(function (q) { if (q[1] + (q === head ? 9 : 0) > maxY) maxY = q[1] + (q === head ? 9 : 0); });
+  var dy = isNaN(p.hy) ? 135 - maxY - p.air : p.hy - p.air;
+  ['hip', 'neck', 'head', 'sh'].forEach(function (n) { r[n] = [r[n][0], r[n][1] + dy]; });
+  ['k', 'f', 'toe', 'e', 'h'].forEach(function (n) { r[n] = r[n].map(function (q) { return [q[0], q[1] + dy]; }); });
+  return r;
+}
+function D2(pts) { return 'M' + pts.map(function (q) { return q[0].toFixed(1) + ' ' + q[1].toFixed(1); }).join(' L'); }
+
+/* Equipo y escenario: db = mancuerna, bb = barra, ball = balón, bar = barra de dominadas */
+var BOX = '<rect x="118" y="119" width="44" height="16" rx="3" class="gi-eq"/>';
+var BARUP = '<line x1="60" y1="8" x2="160" y2="8" class="gi-bar"/>';
+var STAND = F(110, 0, 0, 0, 4, 4);
 var TPL = {
-  squat: { n: 'Sentadilla', a: P(), b: P({ head: [112, 55], neck: [106, 68], hip: [84, 102], k1: [120, 100], f1: [110, 135], e1: [122, 74], h1: [140, 72] }),
-    t: 'Rodillas en línea con los pies, talones apoyados y pecho arriba. No dejes que las rodillas se junten al subir.' },
-  lunge: { n: 'Zancada', a: P(), b: P({ head: [108, 50], neck: [104, 62], hip: [100, 94], k1: [134, 94], f1: [134, 135], k2: [78, 120], f2: [50, 135], e1: [104, 82], h1: [104, 98] }),
-    t: 'Torso erguido y paso largo. La rodilla de delante no pasa mucho la punta del pie y la de atrás baja sin golpear el suelo.' },
-  bridge: { n: 'Puente', a: { head: [30, 120], neck: [45, 122], hip: [100, 126], k1: [130, 96], f1: [150, 133], e1: [75, 130], h1: [100, 133] }, b: { head: [30, 120], neck: [45, 122], hip: [105, 96], k1: [135, 96], f1: [150, 133], e1: [75, 130], h1: [100, 133] },
-    t: 'Empuja con los talones y aprieta glúteos arriba. No arquees la zona lumbar.' },
-  hinge: { n: 'Bisagra de cadera', a: P(), b: P({ head: [144, 62], neck: [130, 66], hip: [82, 88], k1: [92, 112], f1: [100, 135], e1: [130, 92], h1: [128, 116] }),
-    t: 'Lleva la cadera hacia atrás con la espalda recta y rodillas suaves. La barra o las pesas viajan pegadas a las piernas.' },
-  push: { n: 'Empuje', a: { head: [166, 78], neck: [150, 88], hip: [92, 106], k1: [60, 118], f1: [30, 130], e1: [150, 111], h1: [150, 134] }, b: { head: [166, 108], neck: [150, 114], hip: [92, 121], k1: [60, 127], f1: [30, 132], e1: [128, 118], h1: [150, 134] },
-    t: 'Cuerpo en línea recta, abdomen firme y codos a unos 45° del tronco. Baja con control, sin hundir la cadera.' },
-  plank: { n: 'Plancha', a: { head: [168, 100], neck: [152, 106], hip: [95, 112], k1: [62, 120], f1: [30, 130], e1: [152, 128], h1: [168, 130] }, b: { head: [168, 97], neck: [152, 103], hip: [95, 106], k1: [62, 117], f1: [30, 130], e1: [152, 128], h1: [168, 130] },
-    t: 'Línea recta de cabeza a talones, glúteos y abdomen apretados. Respira sin bloquear el aire.' },
-  row: { n: 'Remo', a: P({ head: [144, 58], neck: [130, 64], hip: [84, 86], k1: [92, 112], f1: [88, 135], e1: [132, 90], h1: [132, 112] }), b: P({ head: [144, 58], neck: [130, 64], hip: [84, 86], k1: [92, 112], f1: [88, 135], e1: [106, 78], h1: [126, 88] }),
-    t: 'Espalda recta y mirada al frente. Junta los omóplatos al tirar y baja sin soltar la tensión.' },
-  pull: { n: 'Dominada / colgado', bar: true, a: { head: [112, 62], neck: [112, 74], hip: [112, 108], k1: [112, 124], f1: [100, 136], e1: [112, 48], h1: [112, 22] }, b: { head: [112, 24], neck: [112, 38], hip: [112, 72], k1: [112, 92], f1: [102, 112], e1: [128, 38], h1: [116, 22] },
-    t: 'Empieza con los hombros activos (no colgado "muerto"). Sube llevando el pecho a la barra y baja despacio.' },
-  press: { n: 'Press vertical', a: P({ e1: [126, 54], h1: [120, 34] }), b: P({ e1: [114, 22], h1: [114, 4] }),
-    t: 'Abdomen y glúteos firmes, sin arquear la espalda. Empuja en línea recta sobre la cabeza.' },
-  curl: { n: 'Curl / codos', a: P({ e1: [112, 62], h1: [112, 82] }), b: P({ e1: [112, 62], h1: [128, 44] }),
-    t: 'Codos pegados al cuerpo y sin balancear el torso. Controla la bajada.' },
-  raise: { n: 'Elevación', a: P({ e1: [112, 60], h1: [112, 80] }), b: P({ e1: [130, 46], h1: [152, 46] }),
-    t: 'Sube hasta la altura de los hombros, sin encogerlos ni usar impulso. Peso ligero y control.' },
-  crunch: { n: 'Abdominal', a: { head: [40, 118], neck: [55, 122], hip: [100, 126], k1: [130, 100], f1: [150, 133], e1: [50, 108], h1: [62, 100] }, b: { head: [78, 88], neck: [76, 100], hip: [100, 126], k1: [130, 100], f1: [150, 133], e1: [96, 92], h1: [110, 98] },
-    t: 'Zona lumbar pegada al suelo, mirada al techo y sin tirar del cuello. Sube con el abdomen, no con los brazos.' },
-  legs: { n: 'Elevación de piernas', a: { head: [30, 120], neck: [45, 122], hip: [100, 126], k1: [130, 128], f1: [160, 130], e1: [70, 130], h1: [100, 133] }, b: { head: [30, 120], neck: [45, 122], hip: [100, 126], k1: [102, 94], f1: [102, 62], e1: [70, 130], h1: [100, 133] },
-    t: 'Mantén la zona lumbar pegada al suelo. Si se arquea, flexiona un poco las rodillas.' },
-  calf: { n: 'Talones', a: P(), b: P({ head: [112, 20], neck: [112, 32], hip: [110, 68], k1: [110, 100], f1: [112, 127] }),
-    t: 'Sube lo más alto que puedas, pausa un segundo y baja lento. Apóyate en una pared si necesitas equilibrio.' },
-  run: { n: 'Cardio / salto', a: { head: [112, 28], neck: [110, 40], hip: [106, 76], k1: [128, 90], f1: [124, 114], k2: [92, 108], f2: [78, 128], e1: [128, 62], h1: [140, 48], e2: [94, 60], h2: [84, 76] }, b: { head: [112, 28], neck: [110, 40], hip: [106, 76], k1: [92, 90], f1: [96, 114], k2: [128, 108], f2: [140, 126], e1: [94, 62], h1: [84, 48], e2: [128, 60], h2: [140, 76] },
-    t: 'Aterriza suave sobre la punta del pie y mantén el ritmo. Baja la intensidad si te falta el aire.' }
+  squat: { n: 'Sentadilla', f: [F(110, 0, 0, 0, 20, 20), F(94, 42, 78, -28, 88, 88)], t: 'Rodillas en línea con los pies, talones apoyados y pecho arriba. No dejes que las rodillas se junten al subir.' },
+  goblet: { n: 'Sentadilla goblet', f: [F(110, 0, 0, 0, 28, 150), F(94, 32, 78, -28, 28, 150)], eq: [['c', 6, 'h0']], t: 'Sostén la pesa pegada al pecho, codos hacia abajo y espalda recta durante todo el recorrido.' },
+  backsq: { n: 'Sentadilla con barra', f: [F(110, 0, 0, 0, -45, 140), F(90, 40, 76, -30, -45, 140)], eq: [['p', 10, 'neck']], t: 'La barra descansa sobre la espalda alta, no sobre el cuello. Mirada al frente, abdomen firme y rodillas hacia afuera.' },
+  frontsq: { n: 'Sentadilla frontal', f: [F(110, 0, 0, 0, 80, 165), F(96, 28, 76, -26, 80, 165)], eq: [['p', 9, 'h0']], t: 'Codos altos para que la barra no ruede. Torso muy erguido durante todo el recorrido.' },
+  legpress: { n: 'Prensa de piernas', f: [F(66, -58, 150, 60, 35, 100), F(66, -58, 126, 126, 35, 100)], sc: '<path d="M26 136 L92 88" class="gi-eq" fill="none"/>', t: 'No dejes que la zona lumbar se despegue del respaldo y no bloquees las rodillas al estirar.' },
+  lunge: { n: 'Zancada', f: [F(110, 0, 0, 0, 4, 4), F(104, 6, [78, -52], [-6, -100], 4, 4)], t: 'Torso erguido y paso largo. La rodilla de delante no pasa mucho la punta del pie y la de atrás baja sin golpear el suelo.' },
+  stepup: { n: 'Subida al banco', f: [F(100, 8, [75, 0], [0, 0], 4, 4, { hy: 76 }), F(122, 0, 0, 0, 4, 4, { hy: 56 })], sc: BOX, t: 'Empuja con el talón de la pierna que sube y no te impulses con la de abajo. Baja con control.' },
+  bridge: { n: 'Puente de glúteo', f: [F(98, -90, 140, 40, 90, 90), F(98, -122, 80, 8, 90, 90)], t: 'Empuja con los talones y aprieta glúteos arriba. No arquees la zona lumbar.' },
+  thrust: { n: 'Hip thrust', f: [F(106, -72, 120, 30, 90, 90), F(106, -122, 80, 8, 90, 90)], eq: [['p', 9, 'hip']], sc: '<rect x="30" y="112" width="30" height="23" rx="3" class="gi-eq"/>', t: 'Mentón al pecho y costillas abajo. Sube hasta que el tronco quede casi horizontal y aprieta los glúteos.' },
+  rdl: { n: 'Peso muerto rumano', f: [F(106, 0, 0, 0, 6, 6), F(84, 80, [30, 30], [-6, -6], 6, 6)], eq: [['c', 6, 'h0']], t: 'Lleva la cadera hacia atrás con la espalda recta y rodillas suaves. Las pesas viajan pegadas a las piernas.' },
+  dead: { n: 'Peso muerto', f: [F(82, 62, 100, -38, 0, 0), F(106, 0, 0, 0, 0, 0)], eq: [['p', 11, 'h0']], t: 'Barra pegada a las piernas, espalda neutra y empuja el suelo con los pies. Sube cadera y hombros a la vez.' },
+  swing: { n: 'Swing con kettlebell', f: [F(86, 70, 28, -4, 55, 55), F(106, 0, 0, 0, 92, 92)], eq: [['c', 8, 'h0']], t: 'El impulso sale de la cadera, no de los brazos. Espalda recta y abdomen firme al final.' },
+  calf: { n: 'Elevación de talones', f: [STAND, F(110, 0, 0, 0, 4, 4, { air: 7 })], t: 'Sube lo más alto que puedas, pausa un segundo y baja lento. Apóyate en una pared si necesitas equilibrio.' },
+  legext: { n: 'Extensión de piernas', f: [F(80, 0, 90, 0, 40, 100), F(80, 0, 90, 90, 40, 100)], sc: '<rect x="50" y="86" width="40" height="7" rx="3" class="gi-eq"/><rect x="50" y="93" width="6" height="42" class="gi-eq"/>', t: 'Sube sin balancear el cuerpo y baja despacio. No bloquees la rodilla con fuerza arriba.' },
+  legcurl: { n: 'Curl de pierna', f: [F(104, 4, [0, 0], [0, 0], 4, 4), F(104, 4, [0, 0], [0, -140], 4, 4)], t: 'Mueve solo la pierna: muslo quieto, cadera estable. Controla la bajada.' },
+  kick: { n: 'Patada de glúteo', f: [F(110, 28, [0, 0], [0, 0], 60, 60), F(110, 28, [0, -45], [0, -45], 60, 60)], t: 'Contrae el glúteo para subir la pierna, sin arquear la zona lumbar ni girar la cadera.' },
+  push: { n: 'Flexión', f: [F(70, 76, -104, -104, 0, 0), F(70, 84, -96, -96, -48, 48)], t: 'Cuerpo en línea recta, abdomen firme y codos a unos 45° del tronco. Baja con control, sin hundir la cadera.' },
+  pushkn: { n: 'Flexión de rodillas', f: [F(80, 74, [-82, -82], [-165, -165], 0, 0), F(80, 82, [-84, -84], [-165, -165], -48, 48)], t: 'Línea recta de rodillas a cabeza. Baja el pecho cerca del suelo sin arquear la espalda.' },
+  incpush: { n: 'Flexión inclinada', f: [F(70, 64, -116, -116, 0, 0), F(70, 70, -112, -112, -52, 40)], sc: '<rect x="150" y="100" width="40" height="35" rx="3" class="gi-eq"/>', t: 'Las manos sobre una superficie firme. Mantén el cuerpo recto y baja el pecho hacia el borde.' },
+  bench: { n: 'Press de pecho', f: [F(70, -90, 120, 30, 180, 180), F(70, -90, 120, 30, 100, 180)], eq: [['c', 7, 'h0']], sc: '<rect x="20" y="112" width="96" height="9" rx="3" class="gi-eq"/><rect x="28" y="121" width="5" height="14" class="gi-eq"/><rect x="104" y="121" width="5" height="14" class="gi-eq"/>', t: 'Omóplatos juntos y pies firmes. Baja la carga al pecho con control y empuja sin despegar la cadera del banco.' },
+  fly: { n: 'Aperturas', f: [F(70, -90, 120, 30, 180, 180), F(70, -90, 120, 30, 100, 140)], eq: [['c', 6, 'h0']], sc: '<rect x="20" y="112" width="96" height="9" rx="3" class="gi-eq"/><rect x="28" y="121" width="5" height="14" class="gi-eq"/><rect x="104" y="121" width="5" height="14" class="gi-eq"/>', t: 'Codos ligeramente flexionados y fijos. Abre hasta sentir el pecho estirado, sin bajar de más los codos.' },
+  dip: { n: 'Fondos', f: [F(110, 0, [0, 0], [0, 0], 0, 0, { hy: 62 }), F(110, 6, [10, 10], [-20, -20], -42, 40, { hy: 78 })], sc: '<line x1="96" y1="76" x2="132" y2="76" class="gi-bar"/>', t: 'Codos cerca del cuerpo y hombros lejos de las orejas. Baja solo hasta donde puedas subir sin dolor en el hombro.' },
+  pike: { n: 'Flexión en pica', f: [F(100, 152, [-26, -26], [-26, -26], [-8, -8], [-8, -8]), F(100, 160, [-26, -26], [-26, -26], [-42, -42], [30, 30])], t: 'Cadera alta formando una V invertida. Baja la cabeza entre las manos y empuja de vuelta.' },
+  row: { n: 'Remo', f: [F(86, 72, [20, 20], [-8, -8], 0, 0), F(86, 72, [20, 20], [-8, -8], -75, 20)], eq: [['c', 6, 'h0']], t: 'Espalda recta y mirada al suelo. Junta los omóplatos al tirar y baja sin soltar la tensión.' },
+  seatrow: { n: 'Remo sentado', f: [F(70, 0, [90, 90], [10, 10], 90, 90, { hy: 96 }), F(70, -8, [90, 90], [10, 10], -10, 80, { hy: 96 })], sc: '<rect x="50" y="96" width="34" height="6" rx="3" class="gi-eq"/><line x1="156" y1="70" x2="180" y2="70" class="gi-bar"/>', t: 'Pecho abierto y espalda recta. Lleva los codos hacia atrás sin inclinarte demasiado.' },
+  pulldown: { n: 'Jalón al pecho', f: [F(80, 0, [90, 90], [10, 10], 175, 175, { hy: 98 }), F(80, -8, [90, 90], [10, 10], 40, 145, { hy: 98 })], sc: '<rect x="62" y="98" width="34" height="6" rx="3" class="gi-eq"/><line x1="40" y1="14" x2="130" y2="14" class="gi-bar"/>', t: 'Tira con los codos hacia abajo y atrás, sin balancear el tronco. Sube la barra controlando.' },
+  pull: { n: 'Dominada', f: [F(112, 0, [6, 6], [-100, -100], 180, 180, { hy: 88 }), F(112, 0, [6, 6], [-100, -100], [158, 158], [150, 150], { hy: 62 })], sc: BARUP, t: 'Empieza con los hombros activos (no colgado "muerto"). Sube llevando el pecho a la barra y baja despacio.' },
+  hang: { n: 'Elevación de rodillas colgado', f: [F(112, 0, [4, 4], [-40, -40], 180, 180, { hy: 74 }), F(112, -12, [100, 100], [-10, -10], 180, 180, { hy: 72 })], sc: BARUP, t: 'Evita balancearte. Sube las rodillas curvando la pelvis y baja sin soltarte de golpe.' },
+  press: { n: 'Press de hombros', f: [F(110, 0, 0, 0, [24, 24], [165, 165]), F(110, 0, 0, 0, 178, 178)], eq: [['c', 6, 'h0']], t: 'Abdomen y glúteos firmes, sin arquear la espalda. Empuja en línea recta sobre la cabeza.' },
+  raise: { n: 'Elevaciones', f: [F(110, 0, 0, 0, 6, 6), F(110, 0, 0, 0, 88, 88)], eq: [['c', 6, 'h0']], t: 'Sube hasta la altura de los hombros, sin encogerlos ni usar impulso. Peso ligero y control.' },
+  shrug: { n: 'Encogimientos', f: [F(110, 0, 0, 0, 0, 0), F(110, 0, 0, 0, 0, 0, { sy: -8 })], eq: [['c', 6, 'h0']], t: 'Sube los hombros hacia las orejas sin girarlos. Pausa arriba y baja despacio.' },
+  curl: { n: 'Curl de bíceps', f: [F(110, 0, 0, 0, 2, 2), F(110, 0, 0, 0, 2, 152)], eq: [['c', 6, 'h0']], t: 'Codos pegados al cuerpo y sin balancear el torso. Controla la bajada.' },
+  tri: { n: 'Extensión de tríceps', f: [F(110, 0, 0, 0, 176, -22), F(110, 0, 0, 0, 178, 178)], eq: [['c', 6, 'h0']], t: 'Codos cerca de la cabeza y fijos. Solo se mueve el antebrazo.' },
+  kickb: { n: 'Patada de tríceps', f: [F(92, 62, [20, 20], [-8, -8], -96, 0), F(92, 62, [20, 20], [-8, -8], -96, -96)], eq: [['c', 5, 'h0']], t: 'Codo pegado al costado y alto. Extiende el antebrazo hacia atrás sin mover el brazo.' },
+  skull: { n: 'Press francés', f: [F(70, -90, 120, 30, 180, -90), F(70, -90, 120, 30, 180, 180)], eq: [['c', 6, 'h0']], sc: '<rect x="20" y="112" width="96" height="9" rx="3" class="gi-eq"/><rect x="28" y="121" width="5" height="14" class="gi-eq"/><rect x="104" y="121" width="5" height="14" class="gi-eq"/>', t: 'Los brazos quietos apuntando arriba. Baja hacia la frente doblando solo los codos.' },
+  crunch: { n: 'Abdominal', f: [F(98, -90, 140, 40, 90, 90), F(98, -40, 140, 40, 90, 90)], t: 'Zona lumbar pegada al suelo, mirada al techo y sin tirar del cuello. Sube con el abdomen, no con los brazos.' },
+  legs: { n: 'Elevación de piernas', f: [F(60, -90, 90, 90, 90, 90), F(60, -90, 176, 176, 90, 90)], t: 'Mantén la zona lumbar pegada al suelo. Si se arquea, flexiona un poco las rodillas.' },
+  hollow: { n: 'Hollow hold', f: [F(62, -78, 98, 98, -96, -96), F(62, -70, 108, 108, -100, -100)], t: 'Lumbar pegada al suelo y cuerpo en forma de banana. Si se despega, sube un poco más las piernas.' },
+  deadbug: { n: 'Dead bug', f: [F(80, -90, [178, 100], [90, 92], [176, -150], 180), F(80, -90, [100, 178], [92, 90], [-150, 176], 180)], t: 'Zona lumbar pegada al suelo. Baja brazo y pierna contrarios despacio, sin arquear la espalda.' },
+  plank: { n: 'Plancha', f: [F(60, 80, [-80, -80], [-80, -80], 0, 90), F(60, 82, [-82, -82], [-82, -82], 0, 90)], t: 'Línea recta de cabeza a talones, glúteos y abdomen apretados. Respira sin bloquear el aire.' },
+  mclimb: { n: 'Escaladores', f: [F(70, 76, [-40, -104], [-130, -104], 0, 0), F(70, 76, [-104, -40], [-104, -130], 0, 0)], t: 'Hombros sobre las manos y cadera baja. Lleva las rodillas al pecho con ritmo constante.' },
+  bird: { n: 'Bird dog', f: [F(70, 88, [0, 0], [-90, -90], 0, 0), F(70, 88, [0, -92], [-90, -92], [92, 0], [92, 0])], t: 'Espalda plana como una mesa. Extiende brazo y pierna contrarios sin rotar la cadera.' },
+  super: { n: 'Superman', f: [F(60, 88, -92, -92, 90, 90), F(60, 72, -104, -104, 108, 108)], t: 'Mirada al suelo y cuello neutro. Sube brazos y piernas a la vez y haz una pausa corta.' },
+  vsit: { n: 'Giros rusos', f: [F(80, -35, [135, 135], [60, 60], 60, 60), F(80, -35, [135, 135], [60, 60], 105, 105)], t: 'Espalda recta y pecho abierto. Gira el torso (no solo los brazos) a cada lado.' },
+  bike: { n: 'Bicicleta abdominal', f: [F(70, -52, [140, 100], [40, 100], 130, 130), F(70, -52, [100, 140], [100, 40], 130, 130)], t: 'Lleva el codo hacia la rodilla contraria sin tirar del cuello. Movimiento lento y controlado.' },
+  run: { n: 'Carrera / cardio', f: [F(106, 8, [75, -25], [-5, -50], [-45, 55], [60, 100]), F(106, 8, [-25, 75], [-50, -5], [55, -45], [100, 60])], t: 'Aterriza suave sobre la punta del pie y mantén el ritmo. Baja la intensidad si te falta el aire.' },
+  jack: { n: 'Jumping jacks', f: [F(110, 0, [0, 0], [0, 0], 4, 4), F(110, 0, [22, -22], [22, -22], 172, 172, { air: 6 })], t: 'Aterriza suave con las rodillas flexionadas. Mantén un ritmo constante.' },
+  jsq: { n: 'Sentadilla con salto', f: [F(94, 42, 78, -28, 88, 88), F(110, 0, 0, 0, 175, 175, { air: 22 })], t: 'Amortigua cada aterrizaje flexionando las rodillas y cadera. Rodillas hacia afuera.' },
+  rope: { n: 'Saltar la cuerda', f: [F(110, 0, 0, 0, 12, 90), F(110, 0, 0, 0, 12, 90, { air: 7 })], t: 'Saltos pequeños con las muñecas, aterrizando suave sobre la punta de los pies.' },
+  burpee: { n: 'Burpee', f: [F(110, 0, 0, 0, 4, 4), F(94, 60, 78, -28, 0, 0), F(70, 76, -104, -104, 0, 0), F(110, 0, 0, 0, 175, 175, { air: 18 })], t: 'Mantén la técnica aunque te canses: pecho al suelo, salto y vuelta a empezar a tu ritmo.' },
+  inch: { n: 'Gusano', f: [F(110, 0, 0, 0, 4, 4), F(90, 76, [20, 20], [0, 0], 0, 0, {}), F(70, 76, -104, -104, 0, 0)], t: 'Camina con las manos hasta la plancha y vuelve. Piernas lo más rectas posible y abdomen firme.' },
+  bear: { n: 'Oso caminando', f: [F(70, 86, [30, -10], [-96, -96], [80, -4], [86, -4]), F(70, 86, [-10, 30], [-96, -96], [-4, 80], [-4, 86])], t: 'Rodillas apenas despegadas del suelo y espalda plana. Avanza con brazo y pierna contrarios.' },
+  crab: { n: 'Cangrejo caminando', f: [F(110, -30, [95, 95], [-5, -5], -30, -10, { hy: 100 }), F(110, -30, [85, 85], [-5, -5], -30, -10, { hy: 88 })], t: 'Cadera arriba y hombros lejos de las orejas. Avanza con manos y pies a la vez.' },
+  wallsit: { n: 'Sentadilla isométrica', f: [F(66, 0, 90, 0, [20, 20], [60, 60]), F(66, 0, 90, 0, [20, 20], [60, 60])], sc: '<line x1="52" y1="10" x2="52" y2="137" class="gi-bar"/>', t: 'Espalda pegada a la pared, muslos paralelos al suelo y rodillas sobre los tobillos. Respira con calma.' },
+  nordic: { n: 'Curl nórdico', f: [F(96, 0, 0, -90, 0, 0, { hy: 100 }), F(96, 70, 0, -90, 80, 80, { hy: 100 })], t: 'Baja el cuerpo lento y recto desde las rodillas, sujeta los pies. Usa las manos para amortiguar.' },
+  hs: { n: 'Parada de manos', f: [F(80, 178, 178, 178, 0, 0, { hy: 66 }), F(80, 178, 178, 178, 0, 0, { hy: 66 })], sc: '<line x1="64" y1="8" x2="64" y2="137" class="gi-bar"/>', t: 'Cuerpo recto y abdomen firme. Empieza con los pies cerca de la pared y sal si pierdes el control.' },
+  slam: { n: 'Slam con balón', f: [F(110, 0, 0, 0, 178, 178), F(90, 60, [30, 30], [-8, -8], 40, 40)], eq: [['p', 9, 'hands']], t: 'Sube el balón sobre la cabeza y lánzalo al suelo con fuerza usando todo el cuerpo.' },
+  thr: { n: 'Thruster', f: [F(94, 42, 78, -28, 28, 150), F(110, 0, 0, 0, 28, 150), F(110, 0, 0, 0, 178, 178)], eq: [['c', 6, 'h0']], t: 'Sentadilla profunda y empuje fluido hacia arriba, aprovechando la fuerza de las piernas.' },
+  clean: { n: 'Cargada con mancuernas', f: [F(86, 72, [20, 20], [-8, -8], 4, 4), F(106, 0, 0, 0, 4, 4), F(100, 6, 70, -20, 28, 150)], eq: [['c', 6, 'h0']], t: 'Explosión de cadera y codos rápidos para recibir las pesas en los hombros con las rodillas flexionadas.' },
+  rope2: { n: 'Cuerda de batalla', f: [F(100, 24, [60, 60], [-30, -30], [70, 10], [90, 20]), F(100, 24, [60, 60], [-30, -30], [10, 70], [20, 90])], t: 'Rodillas flexionadas y abdomen firme. Haz olas con los brazos a ritmo constante.' },
+  bikee: { n: 'Bicicleta estática', f: [F(80, 26, [100, 0], [20, 0], 70, 80, { hy: 92 }), F(80, 26, [0, 100], [0, 20], 70, 80, { hy: 92 })], sc: '<line x1="44" y1="92" x2="96" y2="92" class="gi-eq"/><line x1="96" y1="88" x2="150" y2="88" class="gi-eq"/>', t: 'Asiento a la altura de la cadera, espalda larga y pedaleo fluido con rodillas hacia adelante.' },
+  rowe: { n: 'Remo en ergómetro', f: [F(60, 14, [150, 150], [30, 30], 90, 90, { hy: 112 }), F(76, -26, [96, 96], [92, 92], -10, 100, { hy: 112 })], sc: '<line x1="30" y1="116" x2="150" y2="116" class="gi-eq"/>', t: 'La secuencia es: piernas, tronco y brazos; y al volver, al revés. Espalda recta.' }
 };
 var RULES = [
-  { r: /talones/, k: 'calf' }, { r: /dominada|colgarse|colgado|chin-up/, k: 'pull' },
-  { r: /elevación de piernas|tijeras/, k: 'legs' }, { r: /plancha|bird dog|hollow|dead bug|oso|cangrejo|rueda/, k: 'plank' },
-  { r: /crunch|abdominal|bicicleta|giros|v-ups|rusos/, k: 'crunch' },
-  { r: /puente|hip thrust|patada de glúteo|glúteo/, k: 'bridge' },
-  { r: /peso muerto|swing|hiperext|clean|buenos días/, k: 'hinge' },
-  { r: /zancada|búlgara|step|subida|cosaca/, k: 'lunge' },
-  { r: /sentadilla|prensa|goblet|pistol|extensión de piernas|curl femoral|curl nórdico|abducción/, k: 'squat' },
-  { r: /flexión|flexiones|fondos|press de pecho|press de banca|press inclinado|press declinado|aperturas|cruce|pec deck|pullover/, k: 'push' },
-  { r: /pica|parada de manos|press|arnold|militar|thruster|elevación en y/, k: 'press' },
-  { r: /remo|jalón|face pull|pájaros|superman|snow angel/, k: 'row' },
-  { r: /curl|tríceps|francés/, k: 'curl' },
-  { r: /elevaciones|elevación|encogimiento/, k: 'raise' },
-  { r: /burpee|salto|saltar|jumping|rodillas altas|trote|caminata|escalador|patinador|sprint|gusano|boxeo|eslalon|esquiador|rana|remo en ergómetro|elíptica|bicicleta estática|cuerda de batalla|slam|granjero/, k: 'run' }
+  { r: /talones/, k: 'calf' }, { r: /nórdico/, k: 'nordic' }, { r: /isométrica en pared|sentadilla isom/, k: 'wallsit' },
+  { r: /parada de manos/, k: 'hs' }, { r: /pica/, k: 'pike' },
+  { r: /elevación de rodillas colgado|elevación de piernas colgado/, k: 'hang' },
+  { r: /dominada|chin-up/, k: 'pull' }, { r: /colgarse/, k: 'pull' }, { r: /jalón/, k: 'pulldown' },
+  { r: /remo en máquina|remo en polea|remo unilateral en polea/, k: 'seatrow' }, { r: /remo en ergómetro/, k: 'rowe' },
+  { r: /remo|face pull|pájaros|renegado/, k: 'row' }, { r: /superman|snow angel|elevación en y/, k: 'super' },
+  { r: /fondos/, k: 'dip' }, { r: /flexiones inclinadas|flexión inclinada/, k: 'incpush' }, { r: /flexiones de rodillas/, k: 'pushkn' },
+  { r: /flexion|flexiones/, k: 'push' }, { r: /aperturas|cruce|pec deck|pullover/, k: 'fly' },
+  { r: /press de pecho|press de banca|press inclinado|press declinado/, k: 'bench' }, { r: /press francés/, k: 'skull' },
+  { r: /hip thrust/, k: 'thrust' }, { r: /puente/, k: 'bridge' }, { r: /patada de glúteo|abducción/, k: 'kick' },
+  { r: /patada de tríceps/, k: 'kickb' }, { r: /tríceps/, k: 'tri' }, { r: /curl femoral/, k: 'legcurl' }, { r: /curl/, k: 'curl' },
+  { r: /swing/, k: 'swing' }, { r: /thruster|sentadilla con press/, k: 'thr' }, { r: /clean|encogimiento y press/, k: 'clean' },
+  { r: /peso muerto rumano|hiperext|buenos días/, k: 'rdl' }, { r: /peso muerto/, k: 'dead' },
+  { r: /sentadilla frontal/, k: 'frontsq' }, { r: /sentadilla con barra/, k: 'backsq' }, { r: /goblet/, k: 'goblet' },
+  { r: /prensa/, k: 'legpress' }, { r: /extensión de piernas/, k: 'legext' }, { r: /subida|step/, k: 'stepup' },
+  { r: /zancada|búlgara|cosaca/, k: 'lunge' }, { r: /salto|saltar la cuerda/, k: 'jsq' },
+  { r: /sentadilla con salto/, k: 'jsq' }, { r: /sentadilla/, k: 'squat' },
+  { r: /plancha|rueda abdominal|hollow/, k: 'plank' }, { r: /dead bug/, k: 'deadbug' }, { r: /bird dog/, k: 'bird' },
+  { r: /escalador/, k: 'mclimb' }, { r: /bicicleta abdominal/, k: 'bike' }, { r: /giros/, k: 'vsit' },
+  { r: /elevación de piernas|tijeras|v-ups/, k: 'legs' }, { r: /crunch|abdominal/, k: 'crunch' },
+  { r: /elevaciones|elevación frontal/, k: 'raise' }, { r: /encogimiento/, k: 'shrug' }, { r: /press/, k: 'press' },
+  { r: /burpee/, k: 'burpee' }, { r: /gusano/, k: 'inch' }, { r: /oso/, k: 'bear' }, { r: /cangrejo/, k: 'crab' },
+  { r: /jumping|patinador|esquiador|rana/, k: 'jack' }, { r: /saltar la cuerda/, k: 'rope' }, { r: /slam/, k: 'slam' },
+  { r: /cuerda de batalla/, k: 'rope2' }, { r: /bicicleta estática/, k: 'bikee' }, { r: /granjero/, k: 'run' },
+  { r: /trote|caminata|rodillas altas|sprint|elíptica|escaladora|boxeo/, k: 'run' }
 ];
-var GROUP_TPL = { 'Piernas y glúteos': 'squat', 'Pecho': 'push', 'Espalda': 'row', 'Hombros': 'press', 'Brazos': 'curl', 'Abdomen': 'crunch', 'Cardio': 'run', 'Cuerpo completo': 'run',
+var GROUP_TPL = { 'Piernas y glúteos': 'squat', 'Pecho': 'push', 'Espalda': 'row', 'Hombros': 'press', 'Brazos': 'curl', 'Abdomen': 'crunch', 'Cardio': 'run', 'Cuerpo completo': 'burpee',
   'Empuje': 'push', 'Tirón': 'row', 'Core': 'plank' };
 function tplOf(l) {
   var n = l.n.toLowerCase();
   for (var i = 0; i < RULES.length; i++) { if (RULES[i].r.test(n)) return RULES[i].k; }
   return GROUP_TPL[l.g] || 'run';
 }
-function pt(p) { return p[0] + ' ' + p[1]; }
-function limbs(o) {
-  var sh = o.neck, far = function (a, b) { return [a[0] + b, a[1]]; };
-  var k2 = o.k2 || far(o.k1, -7), f2 = o.f2 || far(o.f1, -7), e2 = o.e2 || far(o.e1, -6), h2 = o.h2 || far(o.h1, -6);
-  return {
-    torso: [o.neck, o.hip],
-    leg1: [o.hip, o.k1, o.f1], leg2: [o.hip, k2, f2],
-    arm1: [sh, o.e1, o.h1], arm2: [sh, e2, h2]
-  };
-}
-function dOf(pts) { return 'M' + pts.map(pt).join(' L'); }
-function flat(pts) { var r = []; pts.forEach(function (p) { r.push(p[0], p[1]); }); return r.join(','); }
 function figure(key) {
-  var t = TPL[key] || TPL.run, A = limbs(t.a), B = limbs(t.b);
-  var lim = function (id, op) { return '<path d="' + dOf(A[id]) + '" opacity="' + op + '" data-a="' + flat(A[id]) + '" data-b="' + flat(B[id]) + '"/>'; };
-  return '<svg class="gi-svg" viewBox="0 0 220 150" role="img" aria-label="Ilustración del movimiento: ' + esc(t.n) + '">' +
-    '<line x1="8" y1="137" x2="212" y2="137" class="gi-ground"/>' + (t.bar ? '<line x1="70" y1="20" x2="154" y2="20" class="gi-bar"/>' : '') +
-    '<g class="gi-fig" fill="none" stroke-linecap="round" stroke-linejoin="round">' + lim('leg2', .5) + lim('arm2', .5) + lim('torso', 1) + lim('leg1', 1) + lim('arm1', 1) +
-    '<circle r="9" class="gi-head" cx="' + t.a.head[0] + '" cy="' + t.a.head[1] + '" data-a="' + t.a.head.join(',') + '" data-b="' + t.b.head.join(',') + '"/></g></svg>';
+  var t = TPL[key] || TPL.run;
+  return '<svg class="gi-svg" viewBox="0 0 220 150" role="img" aria-label="Ilustración del movimiento: ' + esc(t.n) + '" data-k="' + esc(key) + '">' +
+    '<line x1="8" y1="137" x2="212" y2="137" class="gi-ground"/>' + (t.sc || '') + '<g class="gi-fig" fill="none" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path data-p="leg1" opacity=".45"/><path data-p="arm1" opacity=".45"/><path data-p="foot1" opacity=".45"/>' +
+    '<path data-p="torso" class="gi-torso"/><path data-p="leg0"/><path data-p="foot0"/><path data-p="arm0"/><circle r="9" class="gi-head" data-p="head"/>' +
+    (t.eq || []).map(function (e, i) { return '<circle class="gi-eqc' + (e[0] === 'p' ? ' gi-pl' : '') + '" r="' + e[1] + '" data-q="' + i + '"/>'; }).join('') + '</g></svg>';
 }
-/* Animación ligera (un solo bucle, solo mientras haya una figura abierta a la vista) */
+function frameAt(t, k) {
+  var fr = t.f, n = fr.length, pos = k * n, i = Math.floor(pos) % n, u = pos - Math.floor(pos);
+  u = (1 - Math.cos(u * Math.PI)) / 2;
+  return lerp(fr[i], fr[(i + 1) % n], u);
+}
+function paint(sv, k) {
+  var t = TPL[sv.getAttribute('data-k')] || TPL.run, s = solve(frameAt(t, k));
+  var q = function (n) { return sv.querySelector('[data-p="' + n + '"]'); };
+  q('torso').setAttribute('d', D2([s.neck, s.hip]));
+  for (var i = 0; i < 2; i++) {
+    q('leg' + i).setAttribute('d', D2([s.hip, s.k[i], s.f[i]]));
+    q('foot' + i).setAttribute('d', D2([s.f[i], s.toe[i]]));
+    q('arm' + i).setAttribute('d', D2([s.sh, s.e[i], s.h[i]]));
+  }
+  var hd = q('head'); hd.setAttribute('cx', s.head[0].toFixed(1)); hd.setAttribute('cy', s.head[1].toFixed(1));
+  (t.eq || []).forEach(function (e, j) {
+    var c = sv.querySelector('[data-q="' + j + '"]'), p = e[2] === 'neck' ? s.neck : e[2] === 'hip' ? s.hip : e[2] === 'hands' ? [(s.h[0][0] + s.h[1][0]) / 2, (s.h[0][1] + s.h[1][1]) / 2] : s.h[0];
+    if (c) { c.setAttribute('cx', p[0].toFixed(1)); c.setAttribute('cy', p[1].toFixed(1)); }
+  });
+}
+/* Animación ligera: un solo bucle y solo mientras haya una figura abierta */
 var live = [], raf = 0, reduce = false;
 try { reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) { /* ignorar */ }
-function num(a) { return a.split(',').map(Number); }
 function frame(now) {
   raf = 0;
   live = live.filter(function (sv) { var d = sv.closest ? sv.closest('details') : null; return sv.isConnected && d && d.open; });
   if (!live.length) return;
-  var ph = (now % 2800) / 2800, k = (1 - Math.cos(ph * 2 * Math.PI)) / 2;
-  live.forEach(function (sv) {
-    var els = sv.querySelectorAll('[data-a]'), i, j, a, b, v;
-    for (i = 0; i < els.length; i++) {
-      a = num(els[i].getAttribute('data-a')); b = num(els[i].getAttribute('data-b')); v = [];
-      for (j = 0; j < a.length; j++) v.push(a[j] + (b[j] - a[j]) * k);
-      if (els[i].tagName === 'circle') { els[i].setAttribute('cx', v[0].toFixed(1)); els[i].setAttribute('cy', v[1].toFixed(1)); }
-      else {
-        var pts = [];
-        for (j = 0; j < v.length; j += 2) pts.push(v[j].toFixed(1) + ' ' + v[j + 1].toFixed(1));
-        els[i].setAttribute('d', 'M' + pts.join(' L'));
-      }
-    }
-  });
+  var k = (now % 3200) / 3200;
+  live.forEach(function (sv) { paint(sv, k); });
   raf = requestAnimationFrame(frame);
 }
 function play(sv) {
-  if (reduce || !sv) return;
+  if (!sv) return;
+  paint(sv, 0);
+  if (reduce) return;
   if (live.indexOf(sv) < 0) live.push(sv);
   if (!raf) raf = requestAnimationFrame(frame);
 }
+
 function lvName(n) { return D.LV_INFO[n] || ''; }
 
 /* ---------- Vista ---------- */
@@ -2903,7 +2981,7 @@ document.addEventListener('click', function (ev) {
 });
 V.renderGui = render;
 V.guiReset = function () { ui.g = ''; ui.q = ''; };
-D.illus = { tplOf: tplOf, figure: figure, TPL: TPL };
+D.illus = { tplOf: tplOf, figure: figure, TPL: TPL, solve: solve, frameAt: frameAt, paint: paint };
 })();
 
 (function () {
@@ -3916,6 +3994,8 @@ attach('picker'); attach('modal');
 /* Instalación como app y funcionamiento sin internet (solo versión web) */
 (function () {
   'use strict';
+  /* Anti-clickjacking: si la app se carga dentro de otra página, sale del marco */
+  try { if (window.top !== window.self) { window.top.location = window.self.location; } } catch (e) { document.documentElement.style.display = 'none'; }
   if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol)) {
     /* Si ya había una versión instalada y llega una nueva, recarga una vez para usarla */
     var hadController = !!navigator.serviceWorker.controller, reloaded = false;

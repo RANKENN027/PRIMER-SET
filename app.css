@@ -529,3 +529,8 @@ html{scroll-behavior:auto}
 .island[data-open="true"] .itm{font-size:.66rem;letter-spacing:-.01em;padding-inline:0}
 .island[data-open="true"] .itm .e{font-size:1.25rem}
 @media (max-width:380px){.island[data-open="true"] .itm{font-size:.6rem}}
+
+.gi-torso{stroke-width:9!important}
+.gi-eq{fill:color-mix(in srgb,var(--muted) 35%,transparent);stroke:none}
+.gi-eqc{fill:var(--warm,#F0B545);stroke:none}
+.gi-pl{fill:none;stroke:var(--warm,#F0B545);stroke-width:5}
