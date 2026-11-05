@@ -1,5 +1,5 @@
 /* Primer Set: guarda la app en el dispositivo para abrirla sin internet. */
-var VERSION = 'primer-set-20261102150337';
+var VERSION = 'primer-set-20261104195617';
 var SHELL = ['./', 'index.html', 'app.css', 'app.js', 'manifest.webmanifest', 'icon-v9-48.png', 'icon-v9-180.png', 'icon-v9-192.png', 'icon-v9-512.png', 'icon-v9-maskable-512.png'];
 
 self.addEventListener('install', function (e) {
@@ -20,8 +20,13 @@ function nf(req, cacheName) {
       var t = setTimeout(fallback, 3000);
       fetch(req).then(function (res) {
         clearTimeout(t);
-        if (res && res.ok) cache.put(req, res.clone());
-        if (!done) { done = true; resolve(res); }
+        if (res && res.ok) {
+          cache.put(req, res.clone());
+          if (!done) { done = true; resolve(res); }
+        } else if (!done) {
+          /* respuesta de error (500, 404...): se prefiere lo guardado, que ya funcionaba */
+          cache.match(req).then(function (hit) { if (!done) { done = true; resolve(hit || res); } });
+        }
       }).catch(function () { clearTimeout(t); fallback(); });
     });
   });
