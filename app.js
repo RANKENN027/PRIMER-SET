@@ -662,7 +662,7 @@ var CALI = {
   LIB: LIB, GROUPS: GROUPS, GROUP_EMOJI: GROUP_EMOJI, libFind: libFind, libSearch: libSearch, libDose: D.libDose, LV_INFO: D.LV_INFO,
   GROUP_SHORT: GROUP_SHORT, emojiFor: emojiFor, WARM: WARM, WARM_TOTAL: '8 min', LEVELS: LEVELS, levelOf: levelOf, buildPlan: buildPlan, REC: REC,
   T: {
-    id: 'cali', brand: '🤸 Primer Set', name: 'Calistenia', emoji: '🤸', themeColor: '#C62828',
+    id: 'cali', brand: '🤸 Primer Set', name: 'Calistenia', emoji: '🤸', themeColor: '#522B5B',
     welcome: 'Tu rutina de calistenia paso a paso, en casa o en el parque. Primero, escribe en una frase por qué quieres entrenar. La verás cada vez que abras la sección.',
     ph: 'Ej.: lograr mi primera dominada', liftW: 'Carga extra (kg, opcional)', liftSum: '📝 Anotar repeticiones y carga extra', liftHint: 'Anota tu mejor serie de hoy. Si no usas carga extra, deja el peso en 0.',
     goalW: 'Carga extra que quiero lograr (kg)', goalWT: 'Subir la carga extra de', rutEmoji: '🤸',
@@ -675,7 +675,7 @@ var GYM = {
   LIB: D.LIB, GROUPS: D.GROUPS, GROUP_EMOJI: D.GROUP_EMOJI, libFind: D.libFind, libSearch: D.libSearch, libDose: D.libDose, LV_INFO: D.LV_INFO,
   GROUP_SHORT: D.GROUP_SHORT, emojiFor: D.emojiFor, WARM: D.WARM, WARM_TOTAL: D.WARM_TOTAL, LEVELS: D.LEVELS, levelOf: D.levelOf, buildPlan: D.buildPlan, REC: D.REC,
   T: {
-    id: 'gym', brand: '🏋️ Primer Set', name: 'Gimnasio', emoji: '🏋️', themeColor: '#0E7C70',
+    id: 'gym', brand: '🏋️ Primer Set', name: 'Gimnasio', emoji: '🏋️', themeColor: '#59171B',
     welcome: 'Tu rutina de gym paso a paso. Primero, escribe en una frase por qué quieres entrenar. La verás cada vez que abras la app.',
     ph: 'Ej.: tener más energía y fuerza para mi día a día', liftW: 'Peso (kg)', liftSum: '📝 Anotar peso y repeticiones', liftHint: 'Anota tu mejor serie de hoy. Así ves cómo subes con el tiempo.',
     goalW: 'Peso que quiero levantar (kg)', goalWT: 'Subir', rutEmoji: '🏋️',
@@ -1023,54 +1023,15 @@ function setTheme(t) {
 }
 if (getTheme() !== 'system') applyTheme(getTheme());
 
-/* ---------- Copia en la nube (solo si el visor la permite) ---------- */
 var REF = null, COL = null, pushing = false, again = false, timer = null;
-function pushRemote() {
-  if (!REF) return;
-  if (pushing) { again = true; return; }
-  pushing = true;
-  var ref = REF;
-  var done = function () { pushing = false; if (again) { again = false; pushRemote(); } };
-  try {
-    ref.set({ json: JSON.stringify(S), updatedAt: S.updatedAt }).then(done, done);
-  } catch (e) { done(); }
-}
+function pushRemote() {}
 function save() {
   S.updatedAt = Date.now();
   dirty = true; clearTimeout(persistT); persistT = setTimeout(persistLocal, 250);
   if (REF) { clearTimeout(timer); timer = setTimeout(pushRemote, 1200); }
 }
-/* Copia en la nube de una sección: la más reciente gana */
-function pullSection(sec) {
-  var ref = COL.doc(DOCS[sec]);
-  return ref.get().then(function (snap) {
-    var active = sec === SEC;
-    var localT = active ? S.updatedAt : (function () { try { return +(JSON.parse(localStorage.getItem(KEYS[sec]) || '{}').updatedAt) || 0; } catch (e) { return 0; } })();
-    if (snap.exists) {
-      var d = snap.data() || {}, o = null;
-      try { o = JSON.parse(d.json); } catch (e) { o = null; }
-      if (o && +o.updatedAt > localT && o.routine) {
-        if (active) { S = norm(o); syncCtx(); persistLocal(); hooks.onRemote(); }
-        else { try { localStorage.setItem(KEYS[sec], JSON.stringify(o)); } catch (e) { /* ignorar */ } }
-      } else if (active && localT > 0) { pushRemote(); }
-    } else if (active && localT > 0) { pushRemote(); }
-  }).catch(function () { /* ignorar */ });
-}
-function initRemote() {
-  try {
-    if (!window.claude || typeof window.claude.use !== 'function') return;
-    Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function (r) {
-      var db = r[0], user = r[1];
-      if (!db || !user) return null;
-      return user.id().then(function (id) {
-        if (!id) return null;
-        COL = db.collection('data/users/' + id);
-        REF = COL.doc(DOCS[SEC]);
-        return pullSection(SEC).then(function () { return pullSection(SEC === 'gym' ? 'cali' : 'gym'); });
-      });
-    }).catch(function () { /* sin nube: se usa solo el navegador */ });
-  } catch (e) { /* ignorar */ }
-}
+function pullSection() { return Promise.resolve(); }
+function initRemote() {}
 
 /* ---------- Cambio de sección (guarda lo actual y carga la otra, sin recargar la página) ---------- */
 function applySection() {
@@ -1090,9 +1051,7 @@ function setSection(sec) {
   try { localStorage.setItem(SEC_KEY, SEC); } catch (e) { /* ignorar */ }
   D.use(SEC);
   S = loadSec(SEC); syncCtx();
-  if (COL) REF = COL.doc(DOCS[SEC]);
   applySection();
-  if (COL) pullSection(SEC);
   return true;
 }
 applySection();
@@ -1210,7 +1169,11 @@ function adherence(today) {
 PS.s = {
   get: function () { return S; },
   set: function (o) { S = norm(o); syncCtx(); persistLocal(); },
-  getSection: function () { return SEC; }, setSection: setSection, syncCtx: syncCtx, reset: function () { S = defState(); syncCtx(); S.updatedAt = Date.now(); persistLocal(); if (REF) pushRemote(); },
+  getSection: function () { return SEC; }, setSection: setSection, syncCtx: syncCtx, reset: function () {
+    clearTimeout(persistT); dirty = false;
+    try { localStorage.removeItem(KEYS.gym); localStorage.removeItem(KEYS.cali); localStorage.removeItem('primerset.prev'); } catch (e) { /* ignorar */ }
+    S = defState(); syncCtx();
+  },
   norm: norm, save: save, hooks: hooks, initRemote: initRemote,
   getLog: getLog, ensureLog: ensureLog, dayPlan: dayPlan, isTrain: isTrain,
   estMin: estMin, fitDay: fitDay, fitAll: fitAll, makePlan: makePlan, mainSec: mainSec, getTheme: getTheme, setTheme: setTheme, flush: flush, fmtEx: fmtEx, streak: streak, weekStats: weekStats, adherence: adherence
@@ -1718,19 +1681,39 @@ function timerCard() {
     '<div class="rowflex"><span class="label">😴 Descanso</span>' + r + '</div></div>';
 }
 
+function ringStats(t) {
+  var mon = U.mondayOf(t), plan = 0, done = 0, mins = 0, i, d, l;
+  for (i = 0; i < 7; i++) {
+    d = U.addDays(mon, i); l = ST.getLog(U.dkey(d));
+    if (ST.isTrain(ST.dayPlan(d))) plan++;
+    if (l && l.status === 'done') { done++; mins += Number(l.minutes) || 0; }
+  }
+  return { plan: Math.max(plan, done), done: done, mins: mins };
+}
+function ringCard(t) {
+  var w = ringStats(t), p = w.plan > 0 ? Math.min(1, w.done / w.plan) : 0, C = 2 * Math.PI * 52;
+  return '<div class="card ring-card"><div class="ring-wrap"><svg class="ring" viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-bg" cx="60" cy="60" r="52"/>' +
+    '<circle class="ring-fg" cx="60" cy="60" r="52" style="--c:' + C.toFixed(1) + '" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - p)).toFixed(1) + '"/></svg>' +
+    '<div class="ring-t"><b class="num">' + Math.round(p * 100) + '%</b><span>de la semana</span></div></div>' +
+    '<div class="ring-stats"><div class="rs"><span class="ti" aria-hidden="true">✅</span><div><b class="num">' + w.done + ' / ' + w.plan + '</b><small>Días entrenados</small></div></div>' +
+    '<div class="rs"><span class="ti" aria-hidden="true">⏱️</span><div><b class="num">' + U.fmtMin(w.mins) + '</b><small>Tiempo activo</small></div></div>' +
+    '<div class="rs"><span class="ti" aria-hidden="true">🔥</span><div><b class="num">' + ST.streak(t) + '</b><small>Racha en días</small></div></div></div></div>';
+}
 function renderHoy() {
   var t = today(), k = U.dkey(t), plan = ST.dayPlan(t), log = ST.getLog(k);
   var checks = log ? log.checks : [];
   var isSkip = !!(log && log.status === 'skip'), isSick = !!(log && log.status === 'sick');
   var train = ST.isTrain(plan) && !isSkip && !isSick;
   var sk = ST.skippedIds(k), rr = ST.restRedeem(k);
-  var h = '<div class="card"><div class="card-head"><div><span class="label">📅 Hoy</span><h2>' + esc(U.longDate(t)) + '</h2></div>' +
+  var h = '<div class="card' + (train ? ' hero' : '') + '"><div class="card-head"><div><span class="label">📅 Hoy</span><h2>' + esc(U.longDate(t)) + '</h2></div>' +
     '<div class="rowflex">' + slotPill(plan) + pill(log) + '</div></div>';
   if (train) {
     h += '<p class="muted">' + (plan.label ? '<b>' + esc(plan.label) + '</b> · ' : '') + 'Sesión de unos <b class="num">' + U.fmtMin(ST.estMin(plan)) + '</b>, con calentamiento y estiramiento. Hoy: ' + esc(D.focusName(plan)) + '.</p>' +
+      '<div class="hero-stats"><span><b class="num">' + plan.ex.length + '</b>ejercicios</span><span><b class="num">' + U.fmtMin(ST.estMin(plan)) + '</b>aprox.</span></div>' +
       '<button type="button" class="btn primary g-open" data-act="gopen">▶ Empezar sesión guiada</button>';
   }
   h += '</div>';
+  h += ringCard(t);
   h += '<div class="card soft quote"><span class="label">💬 Frase del día</span><p class="quote-t">' + esc(D.phraseOf(t)) + '</p></div>';
   h += timerCard();
   if (train && rr) {
@@ -2208,6 +2191,7 @@ V.proExtras = proExtras; V.backupCard = backupCard; V.openRewards = openRewards;
 var K = PS.k, U = PS.u, D = PS.d, ST = PS.s, V = PS.v;
 var esc = U.esc, $ = U.$;
 function S() { return ST.get(); }
+var CLOUD_NOTE = '';
 
 /* ---------- Progreso ---------- */
 function niceStep(max) {
@@ -2383,7 +2367,7 @@ function renderPer() {
   } else if (U.isIOS()) {
     h += '<div class="card soft"><h3>🛟 Protege tu avance</h3><p class="muted small">Tus datos viven solo en este iPhone. Exporta una copia de seguridad de vez en cuando por si cambias de teléfono o reinstalas la app.</p></div>';
   }
-  h += '<div class="card"><h3>💾 Mis datos guardados</h3><p class="muted small">Tu avance se guarda en este navegador y, si has iniciado sesión, también en tu cuenta.</p><div class="rowflex">' +
+  h += '<div class="card"><h3>💾 Mis datos guardados</h3><p class="muted small">Tu avance se guarda solo en este navegador.' + CLOUD_NOTE + ' «Borrar todos mis datos» elimina los datos de Gimnasio y de Calistenia, y la copia temporal de una importación. Tu tema y tu elección de bloque no se borran.</p><div class="rowflex">' +
     (ui.confirmReset
       ? '<button type="button" class="btn warn" data-act="reset">Confirmar: borrar todo</button><button type="button" class="btn ghost" data-act="resetcancel">Cancelar</button>'
       : '<button type="button" class="btn" data-act="reset">Borrar todos mis datos</button>') + '</div></div>';
@@ -3625,7 +3609,7 @@ document.addEventListener('click', function (ev) {
   }
   if (a === 'reset') {
     if (!ui.confirmReset) { ui.confirmReset = true; V.renderPer(); return; }
-    ui.confirmReset = false; ui.step = 1; ui.mErr = ''; ST.reset(); V.legalReset(); renderAll(); V.showLegal(true, function () { V.renderModal(); }); return;
+    ui.confirmReset = false; ui.step = 1; ui.mErr = ''; ui.prevState = null; ST.reset(); V.legalReset(); renderAll(); V.showLegal(true, function () { V.renderModal(); }); return;
   }
   if (a === 'resetcancel') { ui.confirmReset = false; V.renderPer(); return; }
   if (a === 'install') { if (PS.install && PS.install.prompt) PS.install.prompt(); return; }
