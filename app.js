@@ -2051,7 +2051,7 @@ function renderHeader() {
   if (msg) PS.ui.pending = msg;
   var st = ST.streak(today()), s = S(), lv = D.levelOf(s.level), th = ST.getTheme();
   $('#top').innerHTML =
-    '<div class="top-row"><span class="brand">' + D.T.brand + '</span>'+ (D.T.id === 'cali' ? '<span class="secpill">Calistenia · ' + (s.place === 'parque' ? '🌳 Parque' : '🏠 Casa') + '</span>' : '') + '<div class="rowflex" style="gap:8px">' +
+    '<div class="top-row"><span class="brand">' + LOGO + 'Primer Set</span>'+ (D.T.id === 'cali' ? '<span class="secpill">Calistenia · ' + (s.place === 'parque' ? '🌳 Parque' : '🏠 Casa') + '</span>' : '') + '<div class="rowflex" style="gap:8px">' +
     '<span class="streak' + (PS.ui.bump ? ' bump' : '') + '"><span aria-hidden="true">🔥</span><b class="num">' + st + '</b> ' + (st === 1 ? 'día seguido' : 'días seguidos') + '</span>' +
     '<button type="button" class="medalbtn" data-act="rwopen" aria-label="Medallas: ' + s.medals.bal + ' de ' + ST.MAX + '. Ver premios" title="Medallas y premios"><span aria-hidden="true">🏅</span><b class="num">' + s.medals.bal + '</b></button>' +
     '<button type="button" class="iconbtn" data-act="themecycle" aria-label="Tema ' + THEME_NAME[th] + '. Pulsa para cambiar" title="Tema ' + THEME_NAME[th] + '">' + THEME_ICON[th] + '</button>' + (PS.ui.tab === 'per' ? secBtn() : '') + '</div></div>' +
@@ -2097,6 +2097,7 @@ function timerCard() {
     '<div class="rowflex"><span class="label">😴 Descanso</span>' + r + '</div></div>';
 }
 
+var LOGO = '<svg class="bm" aria-hidden="true" viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="11" stroke-linecap="round"><circle cx="100" cy="100" r="86"/><path d="M60 100h80M72 80v40M128 80v40M52 90v20M148 90v20"/></svg>';
 function ringStats(t) {
   var mon = U.mondayOf(t), plan = 0, done = 0, mins = 0, i, d, l;
   for (i = 0; i < 7; i++) {
