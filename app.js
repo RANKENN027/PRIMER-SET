@@ -844,6 +844,375 @@ void U; void rep;
 
 (function () {
 'use strict';
+var D = PS.d;
+
+/* =====================================================================
+   Módulo 1 de la biblioteca ampliada: ejercicios para músculos que suelen
+   quedar olvidados (manguito rotador, trapecio medio e inferior, deltoides
+   posteriores, glúteo medio, isquiotibiales, tibial anterior, antebrazos,
+   estabilizadores del tronco) y ejercicios de movilidad y control.
+
+   Cada ejercicio trae su ficha completa:
+     main  músculo principal        m     músculos secundarios
+     eq    equipo necesario         steps técnica paso a paso
+     err   errores frecuentes       easy  variante más fácil
+     hard  variante más difícil     adv   advertencia técnica
+     d     [series, repeticiones o segundos, descanso en segundos]
+   No se citan estudios ni se prometen resultados: son ejercicios elegidos por
+   su función (patrón de movimiento, músculo que trabajan, facilidad de
+   aprender y de progresar, riesgo). fig:'none' = todavía sin ilustración.
+   ===================================================================== */
+var MOV = 'Movilidad y control';
+
+/* ---------- Bloque A: Gimnasio (los marcados g:1 solo se hacen en el gimnasio) ---------- */
+var GYM_NEW = [
+  { g: 'Hombros', n: 'Rotación externa con banda', lv: 1, d: [3, 15, 45], e: '🔄',
+    eq: 'Banda elástica atada a un punto fijo a la altura del codo', main: 'Manguito rotador (infraespinoso y redondo menor)', m: 'Deltoides posterior',
+    tip: 'Con el codo pegado al costado y doblado a 90°, gira el antebrazo hacia afuera con una banda y regresa lento.',
+    steps: ['De pie, de lado al anclaje de la banda, con el codo pegado al costado y doblado a 90° (puedes poner una toalla doblada entre el codo y el cuerpo).', 'Agarra la banda con la mano más lejana al anclaje y gira el antebrazo hacia afuera sin mover el tronco.', 'Haz una pausa de un segundo y vuelve en 2 o 3 segundos, sin dejar que la banda te jale.', 'Termina las repeticiones y cambia de brazo.'],
+    err: ['Despegar el codo del costado o encoger el hombro.', 'Usar demasiada resistencia y compensar girando el tronco.', 'Soltar la banda de golpe en lugar de controlar el regreso.'],
+    easy: 'Hazlo sin banda, solo con el peso del antebrazo.', hard: 'Usa una banda más fuerte o pasa a la rotación externa en polea.',
+    adv: 'Es un músculo pequeño: usa poca resistencia. Si sientes dolor punzante en el hombro, detente y consulta a un profesional.' },
+  { g: 'Hombros', n: 'Rotación externa acostado con mancuerna', lv: 1, d: [3, 12, 45], e: '🔄',
+    eq: 'Mancuerna muy ligera (1 a 3 kg) y una colchoneta o un banco', main: 'Manguito rotador (infraespinoso y redondo menor)', m: 'Deltoides posterior',
+    tip: 'Acostado de lado con el codo a 90° pegado al costado, sube el antebrazo girando el hombro y baja lento.',
+    steps: ['Acuéstate de lado con la mancuerna en la mano de arriba y el codo doblado a 90°, pegado al costado (toalla doblada debajo del codo).', 'Gira el hombro para subir el antebrazo hasta casi la vertical, sin mover el codo.', 'Baja despacio en unos 3 segundos hasta que el antebrazo quede cerca del abdomen.', 'Completa las repeticiones y cambia de lado.'],
+    err: ['Separar el codo del costado.', 'Elegir un peso demasiado alto y mover el tronco.', 'Bajar muy rápido.'],
+    easy: 'Hazlo sin mancuerna.', hard: 'Añade una pausa de 2 segundos arriba o pasa a la rotación externa con banda.',
+    adv: 'Empieza con un peso que puedas mover sin molestias en el hombro y sube muy poco a poco.' },
+  { g: 'Hombros', n: 'Rotación externa en polea', lv: 2, d: [3, 12, 45], e: '🔄', gym: 1, home: 'Rotación externa con banda',
+    eq: 'Polea baja con asa', main: 'Manguito rotador (infraespinoso y redondo menor)', m: 'Deltoides posterior',
+    tip: 'Con el codo a 90° y pegado al costado, gira el antebrazo hacia afuera tirando del asa de la polea baja.',
+    steps: ['Ponte de lado a la polea baja, con el asa en la mano más lejana, el codo pegado al costado y doblado a 90°.', 'Gira el antebrazo hacia afuera hasta donde llegues sin despegar el codo.', 'Regresa despacio, resistiendo el tirón de la polea.', 'Termina las repeticiones y cambia de lado.'],
+    err: ['Poner demasiado peso y girar el tronco.', 'Dejar que el codo se aleje del cuerpo.', 'Rebotar al volver.'],
+    easy: 'Rotación externa con banda.', hard: 'Más peso en pequeños pasos o una pausa de 2 segundos al final del recorrido.',
+    adv: 'Usa pesos muy bajos. Si hay dolor en la parte alta del hombro, reduce el rango o detente.' },
+  { g: 'Espalda', n: 'Elevación en Y con mancuernas ligeras', lv: 2, d: [3, 10, 45], e: '🙆',
+    eq: 'Banco inclinado (30 a 45°) o colchoneta, y mancuernas muy ligeras', main: 'Trapecio inferior y medio', m: 'Deltoides posterior, serrato y romboides',
+    tip: 'Boca abajo, sube los brazos en forma de Y sin encoger los hombros y baja lento.',
+    steps: ['Acuéstate boca abajo (en el banco inclinado con el pecho apoyado, o en el suelo) con los brazos colgando y los pulgares hacia arriba.', 'Sin encoger los hombros hacia las orejas, sube los brazos en diagonal formando una Y hasta la altura de las orejas.', 'Pausa un segundo arriba y baja en 2 o 3 segundos.', 'Mantén el cuello neutro, mirando al suelo.'],
+    err: ['Encoger los hombros: así trabaja el trapecio superior y no el inferior.', 'Usar impulso o demasiado peso.', 'Arquear la espalda baja.'],
+    easy: 'Hazlo sin peso.', hard: 'Pausa de 3 segundos arriba o sube el peso en pasos muy pequeños.',
+    adv: 'Usa pesos ligeros. Si sientes pellizco en la parte alta del hombro, reduce el recorrido.' },
+  { g: 'Espalda', n: 'Jalón con brazos rectos en polea', lv: 2, d: [3, 12, 60], e: '🧲', gym: 1, home: 'Pullover con mancuerna',
+    eq: 'Polea alta con barra o cuerda', main: 'Dorsal ancho', m: 'Redondo mayor, tríceps (cabeza larga) y abdomen',
+    tip: 'De pie frente a la polea alta, con los brazos casi rectos, baja la barra en arco hasta los muslos.',
+    steps: ['De pie frente a la polea alta, torso ligeramente inclinado, agarra la barra con los brazos casi rectos y los hombros hacia abajo.', 'Baja la barra en un arco hasta los muslos, apretando las axilas, sin doblar los codos.', 'Sube de forma controlada hasta sentir estiramiento en la espalda, sin que el peso te jale hacia adelante.', 'Mantén el abdomen firme todo el recorrido.'],
+    err: ['Doblar los codos y convertirlo en un ejercicio de tríceps.', 'Balancear el torso para mover el peso.', 'Poner más peso del que controlas.'],
+    easy: 'Pullover con mancuerna.', hard: 'Pausa de 1 segundo abajo con la barra en los muslos.',
+    adv: 'Mantén una curva natural en la zona lumbar; no arquees la espalda para bajar más.' },
+  { g: 'Hombros', n: 'Aperturas inversas en máquina', lv: 1, d: [3, 12, 60], e: '🦅', gym: 1, home: 'Pájaros con mancuernas',
+    eq: 'Máquina pec deck en modo inverso (reverse fly)', main: 'Deltoides posterior', m: 'Trapecio medio y romboides',
+    tip: 'Con el pecho apoyado, abre los brazos hacia atrás juntando los omóplatos y vuelve lento.',
+    steps: ['Ajusta el asiento para que las asas queden a la altura de los hombros y apoya el pecho en el respaldo.', 'Con los codos ligeramente flexionados, abre los brazos hacia atrás juntando los omóplatos.', 'Pausa un segundo y regresa despacio sin dejar que las pesas se toquen.', 'Mantén los hombros lejos de las orejas.'],
+    err: ['Encoger los hombros.', 'Echar el cuerpo hacia atrás para mover más peso.', 'Rebotar al volver.'],
+    easy: 'Menos peso y recorrido corto.', hard: 'Pausa de 2 segundos con los omóplatos juntos.',
+    adv: 'Es un grupo pequeño: pesos moderados y control. No fuerces el rango hacia atrás.' },
+  { g: 'Piernas y glúteos', n: 'Almeja con banda', lv: 1, d: [3, 15, 30], e: '🐚',
+    eq: 'Colchoneta y banda elástica (opcional)', main: 'Glúteo medio y menor', m: 'Rotadores externos de la cadera',
+    tip: 'Acostado de lado con las rodillas dobladas, abre la rodilla de arriba sin mover la pelvis y baja lento.',
+    steps: ['Acuéstate de lado con las caderas dobladas unos 45°, las rodillas a unos 90° y la banda sobre las rodillas.', 'Con los pies juntos y sin girar la pelvis hacia atrás, abre la rodilla de arriba como una almeja.', 'Pausa un segundo y baja despacio.', 'Termina las repeticiones y cambia de lado.'],
+    err: ['Girar la pelvis hacia atrás para subir más.', 'Rebotar al bajar.', 'Mover la espalda baja en lugar de la cadera.'],
+    easy: 'Hazlo sin banda.', hard: 'Usa una banda más fuerte o pasa a la caminata lateral con banda.',
+    adv: 'Si sientes que trabaja más la espalda baja que el glúteo, reduce el recorrido.' },
+  { g: 'Piernas y glúteos', n: 'Caminata lateral con banda', lv: 1, d: [3, 12, 45], e: '🦀',
+    eq: 'Banda elástica en los muslos o en los tobillos', main: 'Glúteo medio', m: 'Glúteo menor y tensor de la fascia lata',
+    tip: 'Con la banda sobre las rodillas y las rodillas semiflexionadas, da pasos laterales largos sin juntar los pies.',
+    steps: ['Pon la banda sobre las rodillas (más abajo, en los tobillos, será más difícil) y los pies al ancho de la cadera.', 'Flexiona un poco las rodillas y el torso al frente, como en una postura de atleta.', 'Da un paso lateral largo y acerca el otro pie sin juntarlos del todo para mantener la tensión.', 'Camina 12 pasos hacia un lado y regresa por el otro.'],
+    err: ['Dejar que las rodillas se vayan hacia adentro.', 'Juntar los pies y perder la tensión de la banda.', 'Inclinar el tronco de lado.'],
+    easy: 'Banda ligera sobre las rodillas y pasos cortos.', hard: 'Banda en los tobillos o más baja en sentadilla.',
+    adv: 'Si la banda es demasiado fuerte, las rodillas se hunden: elige una resistencia que controles.' },
+  { g: 'Piernas y glúteos', n: 'Descenso lateral de escalón', lv: 2, d: [3, 10, 60], e: '🪜',
+    eq: 'Escalón o cajón de 15 a 20 cm', main: 'Glúteo medio y cuádriceps (control de la rodilla)', m: 'Abdomen y estabilizadores del tobillo',
+    tip: 'Desde el borde de un escalón, baja el talón de la otra pierna hacia el suelo flexionando la rodilla de apoyo.',
+    steps: ['De pie sobre una pierna en el borde del escalón, con la otra pierna colgando a un lado.', 'Lleva la cadera hacia atrás y flexiona la rodilla de apoyo hasta que el talón libre roce el suelo, sin apoyar el peso.', 'Mantén la rodilla alineada con el segundo dedo del pie y la pelvis nivelada.', 'Sube empujando con el talón de la pierna de apoyo. Cambia de pierna al terminar.'],
+    err: ['Dejar caer la rodilla hacia adentro.', 'Bajar de golpe y apoyar fuerte el pie libre.', 'Inclinar la pelvis hacia un lado.'],
+    easy: 'Usa un escalón más bajo o apóyate con una mano en la pared.', hard: 'Escalón más alto o una mancuerna en la mano contraria.',
+    adv: 'Usa una superficie firme y antideslizante.' },
+  { g: 'Piernas y glúteos', n: 'Peso muerto a una pierna', lv: 2, d: [3, 8, 75], e: '🦩',
+    eq: 'Mancuerna o mochila (opcional)', main: 'Isquiotibiales y glúteo mayor', m: 'Glúteo medio, erectores de la columna y estabilizadores del tobillo',
+    tip: 'De pie sobre una pierna, inclina el torso llevando la otra pierna hacia atrás como una balanza, con la espalda recta.',
+    steps: ['De pie sobre una pierna con la rodilla ligeramente flexionada, con el peso en la mano contraria (o sin peso).', 'Lleva la cadera hacia atrás mientras inclinas el torso y estiras la pierna libre hacia atrás, con la espalda neutra.', 'Baja hasta sentir tensión en la parte trasera del muslo, sin redondear la espalda.', 'Sube apretando el glúteo y cambia de pierna al terminar.'],
+    err: ['Abrir la cadera hacia afuera.', 'Redondear la espalda.', 'Flexionar demasiado la rodilla y convertirlo en sentadilla.'],
+    easy: 'Apóyate con una mano en una pared o toca el suelo con la punta del pie libre.', hard: 'Más peso y una bajada lenta de 3 segundos.',
+    adv: 'Primero domina el equilibrio y la espalda neutra; el peso se añade al final.' },
+  { g: 'Piernas y glúteos', n: 'Curl femoral deslizando', lv: 2, d: [3, 8, 60], e: '🧦',
+    eq: 'Toalla o disco deslizante sobre un suelo liso', main: 'Isquiotibiales', m: 'Glúteos y gemelos',
+    tip: 'Acostado en puente con los talones sobre toallas, desliza los pies alejándolos y recógelos sin bajar la cadera.',
+    steps: ['Acuéstate boca arriba con los talones sobre toallas en un suelo liso y sube la cadera en puente.', 'Sin bajar la cadera, desliza los talones alejándolos hasta estirar casi las piernas.', 'Recoge los talones hacia los glúteos de forma controlada, manteniendo la cadera arriba.', 'Baja la cadera solo al terminar la serie.'],
+    err: ['Dejar caer la cadera al deslizar.', 'Moverse demasiado rápido.', 'Arquear la zona lumbar.'],
+    easy: 'Haz un puente de glúteo simple o desliza menos distancia.', hard: 'Hazlo a una pierna.',
+    adv: 'Si sientes calambre en el muslo, reduce el recorrido y descansa.' },
+  { g: 'Piernas y glúteos', n: 'Elevación de puntas de pie en pared', lv: 1, d: [3, 20, 30], e: '🦶',
+    eq: 'Pared (peso corporal)', main: 'Tibial anterior', m: 'Extensores de los dedos del pie',
+    tip: 'Con la espalda en la pared y los talones en el suelo, sube las puntas de los pies hacia las espinillas.',
+    steps: ['Apoya la espalda y los glúteos en una pared, con los pies a unos 30 o 40 cm de ella y al ancho de la cadera.', 'Con los talones en el suelo, sube las puntas de los pies hacia las espinillas lo más alto que puedas.', 'Pausa un segundo arriba y baja despacio.', 'Mantén las rodillas casi rectas, sin ayudarte con ellas.'],
+    err: ['Despegar los glúteos de la pared.', 'Doblar las rodillas para ayudarte.', 'Hacerlo muy rápido.'],
+    easy: 'Acerca más los pies a la pared.', hard: 'Aleja los pies de la pared o hazlo a una pierna.',
+    adv: 'Es normal sentir quemazón en la espinilla; si hay dolor agudo, detente.' },
+  { g: 'Brazos', n: 'Curl de muñeca con mancuerna', lv: 1, d: [3, 15, 45], e: '✋',
+    eq: 'Mancuerna ligera y un banco o una silla', main: 'Flexores del antebrazo', m: 'Agarre',
+    tip: 'Con el antebrazo apoyado en el muslo y la palma hacia arriba, sube y baja la mancuerna moviendo solo la muñeca.',
+    steps: ['Sentado, apoya el antebrazo en el muslo con la muñeca fuera de la rodilla y la palma hacia arriba.', 'Deja bajar la mancuerna abriendo los dedos hasta donde sea cómodo.', 'Cierra los dedos y sube la muñeca lo más alto posible.', 'Mueve solo la muñeca, sin levantar el antebrazo.'],
+    err: ['Levantar el antebrazo del muslo.', 'Elegir un peso demasiado alto y rebotar.', 'Hacerlo con prisa.'],
+    easy: 'Hazlo sin peso o con un peso muy ligero.', hard: 'Más peso o más tiempo en la bajada (3 segundos).',
+    adv: 'Sube el peso poco a poco: las muñecas y los tendones suelen necesitar más tiempo para adaptarse.' },
+  { g: 'Brazos', n: 'Extensión de muñeca con mancuerna', lv: 1, d: [3, 15, 45], e: '✋',
+    eq: 'Mancuerna ligera y un banco o una silla', main: 'Extensores del antebrazo', m: 'Braquiorradial',
+    tip: 'Con el antebrazo apoyado en el muslo y la palma hacia abajo, sube y baja la mancuerna moviendo solo la muñeca.',
+    steps: ['Sentado, apoya el antebrazo en el muslo con la muñeca fuera de la rodilla y la palma hacia abajo.', 'Deja bajar la mano hasta donde sea cómodo, sin soltar la mancuerna.', 'Sube la muñeca llevando el dorso de la mano hacia ti.', 'Mueve solo la muñeca, con el antebrazo quieto.'],
+    err: ['Usar demasiado peso (estos músculos son pequeños).', 'Levantar el antebrazo del muslo.', 'Mover con impulso.'],
+    easy: 'Hazlo sin peso.', hard: 'Pausa de 2 segundos arriba o un poco más de peso.',
+    adv: 'Empieza con muy poco peso. Si sientes dolor en el lado externo del codo, detente.' },
+  { g: 'Brazos', n: 'Curl inverso con barra', lv: 2, d: [3, 10, 60], e: '🏋️',
+    eq: 'Barra recta o barra EZ', main: 'Braquiorradial y extensores del antebrazo', m: 'Bíceps braquial',
+    tip: 'Con las palmas hacia abajo y los codos pegados al cuerpo, sube la barra sin balancear y baja lento.',
+    steps: ['De pie, agarra la barra con las palmas hacia abajo, al ancho de los hombros y los codos pegados a las costillas.', 'Sube la barra doblando solo los codos, con las muñecas rectas.', 'Pausa un segundo arriba y baja en 2 o 3 segundos.', 'Mantén el torso quieto.'],
+    err: ['Doblar las muñecas hacia atrás.', 'Balancear el cuerpo para subir.', 'Usar el mismo peso que en el curl normal.'],
+    easy: 'Curl martillo con mancuernas.', hard: 'Pausa de 2 segundos a media altura.',
+    adv: 'Usa bastante menos peso que en el curl con barra y mantén las muñecas rectas.' },
+  { g: 'Brazos', n: 'Colgarse de la barra', lv: 1, t: 'time', d: [3, 20, 60], e: '🧗', gym: 1, home: 'Plancha',
+    eq: 'Barra fija o de dominadas', main: 'Agarre y flexores del antebrazo', m: 'Dorsal ancho y estabilizadores del hombro',
+    tip: 'Cuelga de la barra con los brazos estirados y el cuerpo quieto el tiempo indicado.',
+    steps: ['Agarra la barra con las palmas hacia adelante, al ancho de los hombros, con los pies sin tocar el suelo (o con un banco debajo para bajar con seguridad).', 'Mantén los hombros activos: aléjalos de las orejas sin encogerlos.', 'Aguanta el tiempo indicado con el cuerpo quieto y respirando con calma.', 'Baja controlado, apoyando los pies en el banco o el suelo.'],
+    err: ['Encoger los hombros hasta las orejas.', 'Balancear el cuerpo.', 'Soltarse de golpe cuando falla el agarre.'],
+    easy: 'Apoya los pies en un banco para quitar parte del peso.', hard: 'Cuelga más tiempo o pasa a las dominadas.',
+    adv: 'Si el agarre falla, no caigas con las piernas rectas: baja a un banco. Evítalo si tienes dolor agudo en el hombro.' },
+  { g: 'Abdomen', n: 'Pallof press', lv: 1, d: [3, 10, 45], e: '🛡️',
+    eq: 'Polea o banda elástica anclada a la altura del pecho', main: 'Abdomen: antirrotación (oblicuos y transverso)', m: 'Hombros y glúteos',
+    tip: 'De lado al anclaje, estira los brazos al frente resistiendo que la banda te gire el torso.',
+    steps: ['De pie, de lado al anclaje, con la banda o el asa en ambas manos pegadas al pecho, pies al ancho de la cadera y rodillas semiflexionadas.', 'Estira los brazos al frente sin dejar que el torso gire hacia el anclaje.', 'Mantén 2 segundos con los brazos estirados.', 'Regresa las manos al pecho de forma controlada. Cambia de lado al terminar.'],
+    err: ['Dejar que el torso gire hacia el anclaje.', 'Inclinar la cadera o arquear la espalda.', 'Usar una resistencia demasiado fuerte.'],
+    easy: 'Menos resistencia o hazlo de rodillas.', hard: 'Pausa más larga, pies juntos o en posición de una rodilla arriba.',
+    adv: 'Respira con normalidad: no contengas el aire durante la pausa.' },
+  { g: 'Abdomen', n: 'Dead bug', lv: 1, d: [3, 10, 30], e: '🪲',
+    eq: 'Colchoneta', main: 'Transverso del abdomen y recto abdominal', m: 'Flexores de la cadera',
+    tip: 'Boca arriba con las rodillas a 90°, baja un brazo y la pierna contraria sin despegar la espalda baja.',
+    steps: ['Acuéstate boca arriba con los brazos estirados al techo y las caderas y rodillas dobladas a 90°, con la zona lumbar pegada al suelo.', 'Baja a la vez un brazo hacia atrás y la pierna contraria hacia adelante, sin arquear la espalda.', 'Vuelve al centro y alterna.', 'Exhala mientras estiras y mantén el abdomen firme.'],
+    err: ['Despegar la zona lumbar del suelo.', 'Ir demasiado rápido.', 'Contener la respiración.'],
+    easy: 'Mueve solo las piernas o solo los brazos.', hard: 'Hazlo con pausa de 2 segundos al estirar o con una pesa ligera en las manos.',
+    adv: 'Si la espalda baja se despega, reduce el recorrido.' },
+  { g: 'Abdomen', n: 'Caminata de maleta', lv: 2, t: 'time', d: [3, 40, 60], e: '🧳',
+    eq: 'Una mancuerna o una pesa rusa', main: 'Oblicuos y cuadrado lumbar (anti-inclinación lateral)', m: 'Agarre, glúteo medio y hombros',
+    tip: 'Camina erguido con una mancuerna en una sola mano sin inclinarte hacia el peso.',
+    steps: ['Sostén una mancuerna en una mano pegada al costado, de pie y erguido.', 'Camina con pasos controlados, sin inclinar el tronco hacia el peso y con los hombros al mismo nivel.', 'Mantén el abdomen firme y respira con calma durante el tiempo indicado.', 'Cambia la mancuerna de mano y repite.'],
+    err: ['Inclinar el tronco hacia el lado del peso.', 'Encoger el hombro del lado cargado.', 'Dar pasos largos y balancearse.'],
+    easy: 'Usa menos peso o recorre menos distancia.', hard: 'Más peso o sostén la mancuerna a la altura del hombro.',
+    adv: 'Elige un peso con el que puedas mantenerte completamente erguido.' },
+  { g: MOV, n: 'Libro abierto', lv: 1, d: [2, 8, 30], e: '📖',
+    eq: 'Colchoneta', main: 'Movilidad de la columna torácica', m: 'Pecho y hombros',
+    tip: 'Acostado de lado con las rodillas dobladas, abre el brazo de arriba como un libro siguiendo la mano con la mirada.',
+    steps: ['Acuéstate de lado con las rodillas dobladas a 90°, apiladas, y los brazos estirados al frente con las palmas juntas.', 'Abre el brazo de arriba hacia el otro lado como si abrieras un libro, siguiendo la mano con la mirada.', 'Mantén las rodillas pegadas y gira solo la parte alta de la espalda.', 'Vuelve y repite. Cambia de lado al terminar.'],
+    err: ['Separar las rodillas.', 'Forzar el giro hasta sentir dolor.', 'Contener la respiración.'],
+    easy: 'Reduce el recorrido del giro.', hard: 'Mantén 2 o 3 segundos con el brazo abierto.',
+    adv: 'Mueve solo hasta donde sea cómodo; no debe doler.' },
+  { g: MOV, n: 'Zancada con rotación de torso', lv: 1, d: [2, 6, 30], e: '🧘',
+    eq: 'Peso corporal', main: 'Movilidad de cadera y columna torácica', m: 'Glúteos, isquiotibiales y flexores de la cadera',
+    tip: 'Da una zancada larga, apoya la mano en el suelo y gira el torso abriendo el brazo hacia el techo.',
+    steps: ['Da una zancada larga hacia adelante y apoya la mano contraria a la pierna adelantada en el suelo, dentro del pie.', 'Gira el torso y abre el otro brazo hacia el techo siguiendo la mano con la mirada.', 'Vuelve a apoyar la mano y levántate.', 'Cambia de pierna y repite.'],
+    err: ['Dejar caer la rodilla delantera hacia adentro.', 'Girar solo los brazos y no el torso.', 'Hacerlo con prisa.'],
+    easy: 'Apoya la mano en un banco o una silla.', hard: 'Mantén 3 segundos en la rotación.',
+    adv: 'Avanza solo hasta donde puedas sin dolor en la cadera o la ingle.' },
+  { g: MOV, n: 'Sentadilla profunda sostenida', lv: 1, t: 'time', d: [2, 30, 30], e: '🧘',
+    eq: 'Peso corporal; un libro bajo los talones si se levantan', main: 'Movilidad de cadera y tobillo', m: 'Cuádriceps y abdomen',
+    tip: 'Baja a una sentadilla profunda con el pecho arriba, mantén la posición respirando y sube.',
+    steps: ['Pies algo más anchos que los hombros y las puntas ligeramente hacia afuera.', 'Baja lo que puedas con el pecho arriba y las manos juntas frente al pecho.', 'Mantén la posición respirando con calma, empujando suavemente las rodillas hacia afuera.', 'Sube empujando el suelo.'],
+    err: ['Perder el apoyo de los talones sin control.', 'Redondear mucho la zona lumbar.', 'Dejar caer las rodillas hacia adentro.'],
+    easy: 'Agárrate de un poste o una puerta para bajar con ayuda.', hard: 'Mantén más tiempo o añade pequeños balanceos laterales.',
+    adv: 'Si no llegas a la profundidad completa, quédate donde puedas sin dolor.' },
+  { g: MOV, n: 'Equilibrio a una pierna con alcance', lv: 1, d: [3, 6, 30], e: '⚖️',
+    eq: 'Peso corporal y una pared cerca', main: 'Estabilidad de tobillo y cadera (control del equilibrio)', m: 'Glúteo medio y abdomen',
+    tip: 'Sobre una pierna, toca con la punta del otro pie hacia adelante, al lado y atrás sin apoyar el peso.',
+    steps: ['De pie sobre una pierna con la rodilla ligeramente flexionada y una pared cerca por seguridad.', 'Con la pierna libre toca con la punta del pie un punto imaginario al frente, luego al lado y luego atrás, sin apoyar el peso.', 'Vuelve al centro entre cada toque, manteniendo la pelvis nivelada.', 'Completa las repeticiones y cambia de pierna.'],
+    err: ['Apoyar el peso en la pierna libre.', 'Dejar caer la rodilla de apoyo hacia adentro.', 'Mirar al suelo todo el tiempo.'],
+    easy: 'Apoya una mano en la pared.', hard: 'Alcanza más lejos o hazlo sobre un cojín firme, siempre con una pared cerca.',
+    adv: 'Practícalo con un apoyo disponible cerca para evitar caídas.' }
+];
+
+/* ---------- Bloque B: Calistenia (casa, parque o ambos) ---------- */
+var CALI_NEW = [
+  { g: 'Hombros', n: 'Deslizamiento en pared', lv: 1, d: [3, 10, 45], e: '🧱', pl: '🏠',
+    eq: 'Pared', main: 'Serrato anterior y trapecio inferior', m: 'Manguito rotador',
+    tip: 'Con los antebrazos pegados a la pared, desliza los brazos hacia arriba empujando la pared y baja controlado.',
+    steps: ['De pie con espalda, cabeza y glúteos cerca de la pared y los antebrazos apoyados en ella, con los codos a 90° (posición en W).', 'Desliza los antebrazos hacia arriba extendiendo los brazos en Y y empujando la pared suavemente.', 'Pausa un segundo arriba y baja controlado a la posición en W.', 'Mantén el abdomen firme para no arquear la espalda.'],
+    err: ['Arquear la zona lumbar.', 'Despegar los antebrazos de la pared.', 'Encoger los hombros.'],
+    easy: 'Reduce el recorrido hacia arriba.', hard: 'Hazlo más lento o con una banda elástica sobre las muñecas.',
+    adv: 'No fuerces si sientes pellizco en el hombro: reduce el rango.' },
+  { g: 'Empuje', n: 'Flexión con protracción', lv: 1, d: [3, 10, 45], e: '🙌', pl: '🏠🌳',
+    eq: 'Suelo (o un banco bajo para hacerla inclinada)', main: 'Serrato anterior', m: 'Pecho y tríceps',
+    tip: 'En posición de flexión con los brazos estirados, empuja el suelo para separar los omóplatos y vuelve sin doblar los codos.',
+    steps: ['Colócate en posición de flexión (o de rodillas) con los brazos estirados bajo los hombros.', 'Sin doblar los codos, empuja el suelo y separa los omóplatos hasta redondear ligeramente la parte alta de la espalda.', 'Vuelve juntando los omóplatos, sin hundir el pecho entre los brazos.', 'Mantén el cuerpo recto y el abdomen firme.'],
+    err: ['Doblar los codos.', 'Hundir la cadera.', 'Hacerlo con movimientos bruscos.'],
+    easy: 'Hazlo de rodillas o con las manos sobre un banco.', hard: 'Termina cada flexión completa con la protracción.',
+    adv: 'El movimiento es pequeño: si no lo sientes en las costillas, revisa que los codos queden estirados.' },
+  { g: 'Tirón', n: 'Dominada escapular', lv: 2, d: [3, 8, 60], e: '🧗', pl: '🌳',
+    eq: 'Barra', main: 'Trapecio inferior y dorsal ancho', m: 'Serrato y agarre',
+    tip: 'Colgado de la barra con los brazos estirados, baja los hombros alejándolos de las orejas para subir unos centímetros.',
+    steps: ['Cuelga de la barra con los brazos estirados y los hombros relajados hacia las orejas.', 'Sin doblar los codos, baja los hombros alejándolos de las orejas para elevar el cuerpo unos centímetros.', 'Pausa un segundo y regresa controlado a la posición colgada.', 'Mantén el cuerpo quieto, sin balanceo.'],
+    err: ['Doblar los codos y tirar con los bíceps.', 'Balancear el cuerpo.', 'Hacer un movimiento mínimo y apresurado.'],
+    easy: 'Apoya los pies en un banco.', hard: 'Pasa a las dominadas negativas.',
+    adv: 'Es la base de la dominada: domínalo antes de hacer dominadas completas.' },
+  { g: 'Tirón', n: 'Remo invertido abierto', lv: 2, d: [3, 8, 60], e: '🧗', pl: '🏠🌳',
+    eq: 'Barra baja, anillas o una mesa muy firme', main: 'Deltoides posterior y trapecio medio', m: 'Romboides y bíceps',
+    tip: 'Bajo una barra baja con agarre ancho, tira del pecho hacia la barra con los codos abiertos.',
+    steps: ['Acuéstate bajo una barra baja y agárrala con las palmas hacia adelante, más ancho que los hombros, con el cuerpo recto y los talones apoyados.', 'Tira del pecho hacia la barra con los codos abiertos, a unos 90° del torso.', 'Pausa un segundo con los omóplatos juntos.', 'Baja despacio con el cuerpo recto.'],
+    err: ['Hundir la cadera.', 'Encoger los hombros.', 'Hacer solo la mitad del recorrido.'],
+    easy: 'Flexiona las rodillas y apoya los pies más cerca.', hard: 'Eleva los pies sobre un banco.',
+    adv: 'Si usas una mesa, comprueba que sea muy firme y que no se deslice.' },
+  { g: 'Piernas y glúteos', n: 'Abducción de cadera acostado', lv: 1, d: [3, 15, 30], e: '🍑', pl: '🏠',
+    eq: 'Colchoneta', main: 'Glúteo medio y menor', m: 'Tensor de la fascia lata',
+    tip: 'Acostado de lado con el cuerpo recto, sube la pierna de arriba hasta unos 45° con la punta al frente y baja lento.',
+    steps: ['Acuéstate de lado con el cuerpo en línea recta y la pierna de abajo doblada para estabilizarte.', 'Sube la pierna de arriba, recta y con la punta al frente (no hacia el techo), hasta unos 45°.', 'Pausa un segundo y baja despacio.', 'Termina las repeticiones y cambia de lado.'],
+    err: ['Girar la pelvis hacia atrás.', 'Subir la pierna por delante del cuerpo.', 'Usar impulso.'],
+    easy: 'Reduce el recorrido.', hard: 'Pasa a la plancha lateral con elevación de pierna.',
+    adv: 'Si trabaja más la espalda baja que el glúteo, reduce el recorrido.' },
+  { g: 'Core', n: 'Plancha lateral con elevación de pierna', lv: 2, d: [3, 8, 45], e: '🧘', pl: '🏠🌳',
+    eq: 'Suelo o colchoneta', main: 'Oblicuos y glúteo medio', m: 'Hombro de apoyo',
+    tip: 'En plancha lateral, sube la pierna de arriba unos 30 o 40 cm y bájala controlado sin perder la línea del cuerpo.',
+    steps: ['Colócate en plancha lateral apoyado en el antebrazo, con la cadera alta y el cuerpo recto.', 'Sube la pierna de arriba unos 30 o 40 cm, con la punta al frente.', 'Baja controlado sin dejar caer la cadera.', 'Termina las repeticiones y cambia de lado.'],
+    err: ['Dejar caer la cadera.', 'Girar el torso hacia el suelo.', 'Subir la pierna demasiado y perder la línea.'],
+    easy: 'Plancha lateral con la rodilla de abajo apoyada.', hard: 'Pasa a la plancha lateral con la pierna sobre un banco.',
+    adv: 'Si el hombro de apoyo molesta, apoya la rodilla o haz la plancha lateral simple.' },
+  { g: 'Piernas y glúteos', n: 'Descenso lateral de escalón', lv: 2, d: [3, 10, 60], e: '🪜', pl: '🏠🌳',
+    eq: 'Escalón, banco bajo o primer peldaño de una escalera', main: 'Glúteo medio y cuádriceps (control de la rodilla)', m: 'Abdomen y estabilizadores del tobillo',
+    tip: 'Desde el borde de un escalón, baja el talón de la otra pierna hacia el suelo flexionando la rodilla de apoyo.',
+    steps: ['De pie sobre una pierna en el borde del escalón, con la otra pierna colgando a un lado.', 'Lleva la cadera hacia atrás y flexiona la rodilla de apoyo hasta que el talón libre roce el suelo, sin apoyar el peso.', 'Mantén la rodilla alineada con el segundo dedo del pie y la pelvis nivelada.', 'Sube empujando con el talón de apoyo. Cambia de pierna al terminar.'],
+    err: ['Dejar caer la rodilla hacia adentro.', 'Bajar de golpe y apoyar fuerte el pie libre.', 'Inclinar la pelvis hacia un lado.'],
+    easy: 'Usa un escalón más bajo o apóyate con una mano en la pared.', hard: 'Escalón más alto o sostén una mochila con peso.',
+    adv: 'Usa una superficie firme y antideslizante.' },
+  { g: 'Piernas y glúteos', n: 'Peso muerto a una pierna sin peso', lv: 1, d: [3, 8, 45], e: '🦩', pl: '🏠🌳',
+    eq: 'Peso corporal', main: 'Isquiotibiales y glúteo mayor', m: 'Glúteo medio, erectores de la columna y estabilizadores del tobillo',
+    tip: 'De pie sobre una pierna, inclina el torso llevando la otra pierna hacia atrás como una balanza, con la espalda recta.',
+    steps: ['De pie sobre una pierna con la rodilla ligeramente flexionada y los brazos al frente para equilibrarte.', 'Lleva la cadera hacia atrás mientras inclinas el torso y estiras la pierna libre hacia atrás, con la espalda neutra.', 'Baja hasta sentir tensión en la parte trasera del muslo, sin redondear la espalda.', 'Sube apretando el glúteo y cambia de pierna al terminar.'],
+    err: ['Abrir la cadera hacia afuera.', 'Redondear la espalda.', 'Flexionar demasiado la rodilla.'],
+    easy: 'Apóyate con una mano en una pared o toca el suelo con la punta del pie libre.', hard: 'Sostén una mochila con peso y baja en 3 segundos.',
+    adv: 'Primero domina el equilibrio y la espalda neutra; el peso se añade al final.' },
+  { g: 'Piernas y glúteos', n: 'Curl femoral deslizando con toalla', lv: 2, d: [3, 8, 60], e: '🧦', pl: '🏠',
+    eq: 'Toalla sobre un suelo liso', main: 'Isquiotibiales', m: 'Glúteos y gemelos',
+    tip: 'Acostado en puente con los talones sobre toallas, desliza los pies alejándolos y recógelos sin bajar la cadera.',
+    steps: ['Acuéstate boca arriba con los talones sobre toallas en un suelo liso y sube la cadera en puente.', 'Sin bajar la cadera, desliza los talones alejándolos hasta estirar casi las piernas.', 'Recoge los talones hacia los glúteos de forma controlada, manteniendo la cadera arriba.', 'Baja la cadera solo al terminar la serie.'],
+    err: ['Dejar caer la cadera al deslizar.', 'Moverse demasiado rápido.', 'Arquear la zona lumbar.'],
+    easy: 'Haz el puente de glúteo o desliza menos distancia.', hard: 'Hazlo a una pierna o pasa al curl nórdico asistido.',
+    adv: 'Si sientes calambre en el muslo, reduce el recorrido y descansa.' },
+  { g: 'Piernas y glúteos', n: 'Puente con talones sobre silla', lv: 2, d: [3, 10, 45], e: '🪑', pl: '🏠',
+    eq: 'Silla o banco estable (contra una pared)', main: 'Isquiotibiales', m: 'Glúteos',
+    tip: 'Acostado con los talones sobre una silla y las piernas casi estiradas, sube la cadera apretando y baja lento.',
+    steps: ['Acuéstate boca arriba con los talones sobre una silla estable (apoyada contra la pared) y las piernas casi estiradas.', 'Empuja los talones contra la silla y sube la cadera hasta formar una línea recta de hombros a talones.', 'Mantén un segundo arriba apretando los glúteos.', 'Baja despacio sin apoyar del todo la cadera.'],
+    err: ['Arquear la zona lumbar al subir.', 'Dejar que la silla se desplace.', 'Empujar con los dedos de los pies en lugar de los talones.'],
+    easy: 'Haz el puente de glúteo con los pies en el suelo.', hard: 'Hazlo a una pierna.',
+    adv: 'Si notas calambre en el muslo, acerca la silla y reduce el recorrido.' },
+  { g: 'Piernas y glúteos', n: 'Elevación de puntas de pie en pared', lv: 1, d: [3, 20, 30], e: '🦶', pl: '🏠',
+    eq: 'Pared (peso corporal)', main: 'Tibial anterior', m: 'Extensores de los dedos del pie',
+    tip: 'Con la espalda en la pared y los talones en el suelo, sube las puntas de los pies hacia las espinillas.',
+    steps: ['Apoya la espalda y los glúteos en una pared, con los pies a unos 30 o 40 cm de ella y al ancho de la cadera.', 'Con los talones en el suelo, sube las puntas de los pies hacia las espinillas lo más alto que puedas.', 'Pausa un segundo arriba y baja despacio.', 'Mantén las rodillas casi rectas, sin ayudarte con ellas.'],
+    err: ['Despegar los glúteos de la pared.', 'Doblar las rodillas para ayudarte.', 'Hacerlo muy rápido.'],
+    easy: 'Acerca más los pies a la pared.', hard: 'Aleja los pies de la pared o hazlo a una pierna.',
+    adv: 'Es normal sentir quemazón en la espinilla; si hay dolor agudo, detente.' },
+  { g: MOV, n: 'Preparación de muñecas', lv: 1, d: [2, 10, 30], e: '🤲', pl: '🏠🌳',
+    eq: 'Suelo', main: 'Movilidad de flexores y extensores de la muñeca', m: 'Antebrazos',
+    tip: 'En cuatro apoyos, balancea el cuerpo adelante y atrás y gira las manos para preparar las muñecas antes de empujar.',
+    steps: ['En cuatro apoyos con las palmas en el suelo y los dedos hacia adelante.', 'Balancea el cuerpo suavemente hacia adelante y atrás sin levantar las palmas.', 'Gira las manos para que los dedos apunten hacia los lados y luego hacia las rodillas, repitiendo el balanceo en cada posición.', 'Si se siente incómodo, apoya los puños cerrados.'],
+    err: ['Cargar todo el peso de golpe.', 'Rebotar.', 'Ignorar el dolor.'],
+    easy: 'Apoya los puños o hazlo con menos carga sobre las manos.', hard: 'Pasa más tiempo en cada posición.',
+    adv: 'Úsalo antes de flexiones y de la parada de manos. Una tensión suave es normal; el dolor agudo, no.' },
+  { g: 'Tirón', n: 'Colgarse con toalla', lv: 2, t: 'time', d: [3, 15, 60], e: '🧗', pl: '🌳',
+    eq: 'Barra y una toalla resistente', main: 'Antebrazos y agarre', m: 'Dorsal ancho',
+    tip: 'Pasa una toalla sobre la barra, agárrala con ambas manos y cuelga con los hombros activos.',
+    steps: ['Pasa una toalla resistente sobre la barra y sostén los dos extremos con las manos a la altura de los hombros.', 'Cuelga con los brazos estirados y los hombros activos, sin encogerlos.', 'Aguanta el tiempo indicado con el cuerpo quieto.', 'Baja con control a un banco o al suelo.'],
+    err: ['Usar una toalla que se resbala.', 'Encoger los hombros.', 'Soltarse de golpe al final.'],
+    easy: 'Apoya los pies en un banco o cuelga de la barra sin toalla.', hard: 'Cuelga más tiempo o hazlo con una sola mano en la toalla y la otra en la barra.',
+    adv: 'Comprueba que la toalla esté bien asegurada antes de cargar todo el peso.' },
+  { g: 'Core', n: 'Plancha inversa', lv: 1, t: 'time', d: [3, 20, 45], e: '🧘', pl: '🏠',
+    eq: 'Suelo', main: 'Cadena posterior: glúteos, isquiotibiales y erectores', m: 'Tríceps y hombros',
+    tip: 'Sentado con las manos detrás, empuja con manos y talones para elevar la cadera en línea recta y mantén.',
+    steps: ['Siéntate con las piernas estiradas y las manos detrás del cuerpo, con los dedos hacia los pies.', 'Empuja con las manos y los talones para elevar la cadera hasta formar una línea recta de hombros a talones.', 'Mantén la posición sin hundir la cadera, respirando con calma.', 'Baja con control al terminar el tiempo.'],
+    err: ['Hundir la cadera.', 'Encoger los hombros hacia las orejas.', 'Forzar el cuello hacia atrás.'],
+    easy: 'Dobla las rodillas (posición de mesa).', hard: 'Eleva una pierna unos segundos, alternando.',
+    adv: 'Si las muñecas molestan, gira un poco las manos hacia afuera o haz la versión con las rodillas dobladas.' },
+  { g: 'Core', n: 'L-sit (progresión)', lv: 2, t: 'time', d: [3, 10, 60], e: '🔥', pl: '🌳',
+    eq: 'Paralelas, dos bancos o bloques firmes para apoyar las manos', main: 'Flexores de la cadera y recto abdominal', m: 'Tríceps y hombros (depresores)',
+    tip: 'Apoyado en los brazos, eleva los pies del suelo con las rodillas dobladas y estíralas poco a poco.',
+    steps: ['Apoya las manos en las paralelas o en dos bloques firmes, con los brazos estirados y los hombros bajos, lejos de las orejas.', 'Empuja hacia abajo y eleva los pies del suelo con las rodillas dobladas.', 'Mantén la posición el tiempo indicado, respirando.', 'Cuando lo domines, estira poco a poco las piernas.'],
+    err: ['Encoger los hombros.', 'Dejar caer el pecho y la cadera.', 'Contener la respiración.'],
+    easy: 'Levanta solo los pies unos segundos con las rodillas dobladas.', hard: 'Estira las piernas por completo (L-sit completo).',
+    adv: 'Exige hombros y muñecas fuertes; avanza gradualmente y detente si molestan.' },
+  { g: 'Core', n: 'Plancha lateral con pierna en banco', lv: 3, t: 'time', d: [3, 20, 60], e: '🧘', pl: '🌳',
+    eq: 'Un banco bajo', main: 'Aductores y oblicuos', m: 'Glúteo medio y hombro de apoyo',
+    tip: 'En plancha lateral con la pierna de arriba apoyada en un banco, eleva la cadera en línea recta y mantén (versión Copenhague).',
+    steps: ['Colócate de lado con el antebrazo apoyado en el suelo y la parte interna de la rodilla de arriba sobre el banco (versión corta).', 'Eleva la cadera hasta que el cuerpo forme una línea recta, con la pierna de abajo flotando.', 'Mantén el tiempo indicado, respirando y sin girar el torso.', 'Baja con control y cambia de lado.'],
+    err: ['Dejar caer la cadera.', 'Girar el torso hacia el suelo.', 'Pasar a la versión larga antes de dominar la corta.'],
+    easy: 'Plancha lateral simple con las rodillas apoyadas.', hard: 'Apoya el pie y la pierna recta sobre el banco; añade una elevación de la pierna de abajo.',
+    adv: 'Trabaja la zona interna del muslo y la ingle: avanza gradualmente y detente si hay dolor allí.' },
+  { g: 'Empuje', n: 'Depresión escapular en paralelas', lv: 2, d: [3, 8, 60], e: '🤸', pl: '🌳',
+    eq: 'Paralelas', main: 'Trapecio inferior y dorsal ancho', m: 'Tríceps y serrato',
+    tip: 'Apoyado en las paralelas con los brazos rectos, empuja las barras para bajar los hombros y subir unos centímetros.',
+    steps: ['Apoya las manos en las paralelas con los brazos estirados y los hombros subidos hacia las orejas.', 'Empuja las barras hacia abajo y baja los hombros para elevar el cuerpo unos centímetros, sin doblar los codos.', 'Pausa un segundo y regresa controlado.', 'Mantén el cuerpo quieto, sin balancearte.'],
+    err: ['Doblar los codos.', 'Balancearse.', 'Hacer un movimiento corto y sin control.'],
+    easy: 'Hazlo con los pies apoyados en el suelo.', hard: 'Pasa a los fondos en paralelas.',
+    adv: 'Es la base de los fondos y las posiciones de apoyo: domínalo antes de hacer fondos completos.' },
+  { g: MOV, n: 'Libro abierto', lv: 1, d: [2, 8, 30], e: '📖', pl: '🏠',
+    eq: 'Colchoneta', main: 'Movilidad de la columna torácica', m: 'Pecho y hombros',
+    tip: 'Acostado de lado con las rodillas dobladas, abre el brazo de arriba como un libro siguiendo la mano con la mirada.',
+    steps: ['Acuéstate de lado con las rodillas dobladas a 90°, apiladas, y los brazos estirados al frente con las palmas juntas.', 'Abre el brazo de arriba hacia el otro lado como si abrieras un libro, siguiendo la mano con la mirada.', 'Mantén las rodillas pegadas y gira solo la parte alta de la espalda.', 'Vuelve y repite. Cambia de lado al terminar.'],
+    err: ['Separar las rodillas.', 'Forzar el giro hasta sentir dolor.', 'Contener la respiración.'],
+    easy: 'Reduce el recorrido del giro.', hard: 'Mantén 2 o 3 segundos con el brazo abierto.',
+    adv: 'Mueve solo hasta donde sea cómodo; no debe doler.' },
+  { g: MOV, n: 'Zancada con rotación de torso', lv: 1, d: [2, 6, 30], e: '🧘', pl: '🏠🌳',
+    eq: 'Peso corporal', main: 'Movilidad de cadera y columna torácica', m: 'Glúteos, isquiotibiales y flexores de la cadera',
+    tip: 'Da una zancada larga, apoya la mano en el suelo y gira el torso abriendo el brazo hacia el techo.',
+    steps: ['Da una zancada larga hacia adelante y apoya la mano contraria a la pierna adelantada en el suelo, dentro del pie.', 'Gira el torso y abre el otro brazo hacia el techo siguiendo la mano con la mirada.', 'Vuelve a apoyar la mano y levántate.', 'Cambia de pierna y repite.'],
+    err: ['Dejar caer la rodilla delantera hacia adentro.', 'Girar solo los brazos y no el torso.', 'Hacerlo con prisa.'],
+    easy: 'Apoya la mano en un banco o una silla.', hard: 'Mantén 3 segundos en la rotación.',
+    adv: 'Avanza solo hasta donde puedas sin dolor en la cadera o la ingle.' },
+  { g: MOV, n: 'Sentadilla profunda sostenida', lv: 1, t: 'time', d: [2, 30, 30], e: '🧘', pl: '🏠🌳',
+    eq: 'Peso corporal; un libro bajo los talones si se levantan', main: 'Movilidad de cadera y tobillo', m: 'Cuádriceps y abdomen',
+    tip: 'Baja a una sentadilla profunda con el pecho arriba, mantén la posición respirando y sube.',
+    steps: ['Pies algo más anchos que los hombros y las puntas ligeramente hacia afuera.', 'Baja lo que puedas con el pecho arriba y las manos juntas frente al pecho.', 'Mantén la posición respirando con calma, empujando suavemente las rodillas hacia afuera.', 'Sube empujando el suelo.'],
+    err: ['Perder el apoyo de los talones sin control.', 'Redondear mucho la zona lumbar.', 'Dejar caer las rodillas hacia adentro.'],
+    easy: 'Agárrate de un poste o una puerta para bajar con ayuda.', hard: 'Mantén más tiempo o añade pequeños balanceos laterales.',
+    adv: 'Si no llegas a la profundidad completa, quédate donde puedas sin dolor.' },
+  { g: MOV, n: 'Equilibrio a una pierna con alcance', lv: 1, d: [3, 6, 30], e: '⚖️', pl: '🏠🌳',
+    eq: 'Peso corporal y una pared cerca', main: 'Estabilidad de tobillo y cadera (control del equilibrio)', m: 'Glúteo medio y abdomen',
+    tip: 'Sobre una pierna, toca con la punta del otro pie hacia adelante, al lado y atrás sin apoyar el peso.',
+    steps: ['De pie sobre una pierna con la rodilla ligeramente flexionada y una pared cerca por seguridad.', 'Con la pierna libre toca con la punta del pie un punto imaginario al frente, luego al lado y luego atrás, sin apoyar el peso.', 'Vuelve al centro entre cada toque, manteniendo la pelvis nivelada.', 'Completa las repeticiones y cambia de pierna.'],
+    err: ['Apoyar el peso en la pierna libre.', 'Dejar caer la rodilla de apoyo hacia adentro.', 'Mirar al suelo todo el tiempo.'],
+    easy: 'Apoya una mano en la pared.', hard: 'Alcanza más lejos o hazlo sobre un cojín firme, siempre con una pared cerca.',
+    adv: 'Practícalo con un apoyo disponible cerca para evitar caídas.' }
+];
+
+function build(p, x, cali) {
+  var t = x.t === 'time' ? 'time' : 'reps';
+  return {
+    g: x.g, n: x.n, e: x.e || p.GROUP_EMOJI[x.g], t: t, lv: x.lv, d: x.d,
+    tip: (cali ? (x.pl || '🏠') + ' ' : '') + x.tip, m: x.m,
+    main: x.main, eq: x.eq, steps: x.steps, err: x.err, easy: x.easy, hard: x.hard, adv: x.adv, fig: 'none', mod: cali ? 'cali' : 'gym'
+  };
+}
+function addTo(sec, list, cali) {
+  var p = D.packs[sec], by = {}, extra = {}, i, x, l;
+  if (!p) return;
+  if (p.GROUPS.indexOf(MOV) < 0) p.GROUPS.push(MOV);
+  p.GROUP_EMOJI[MOV] = '🧘';
+  if (p.GROUP_SHORT) p.GROUP_SHORT[MOV] = 'Movilidad';
+  p.LIB.forEach(function (q) { by[q.n] = q; });
+  for (i = 0; i < list.length; i++) {
+    x = list[i];
+    if (by[x.n]) continue;
+    l = build(p, x, cali);
+    by[x.n] = l; extra[x.n] = l; p.LIB.push(l);
+    if (x.gym && !cali && D.GH) D.GH[x.n] = x.home;
+  }
+  var base = p.libFind;
+  p.libFind = function (n) { return extra[n] || base(n); };
+  var baseE = p.emojiFor;
+  p.emojiFor = function (n) { return extra[n] ? extra[n].e : baseE(n); };
+}
+addTo('gym', GYM_NEW, false);
+addTo('cali', CALI_NEW, true);
+})();
+
+(function () {
+'use strict';
 var K = PS.k, U = PS.u, D = PS.d;
 
 /* ---------- Estado ---------- */
@@ -1023,6 +1392,52 @@ function setTheme(t) {
 }
 if (getTheme() !== 'system') applyTheme(getTheme());
 
+/* ---------- Paleta de colores por bloque (solo se elige en Ajustes). Los dos bloques nunca repiten el mismo color. ---------- */
+var PAL_KEYS = { gym: 'primerset.palette.gym', cali: 'primerset.palette.cali' };
+var PAL_OLD = 'primerset.palette';
+var PALETTES = { gray: '#222222', blue: '#1D4E89', warm: '#C0392B' };
+function otherSec(sec) { return sec === 'cali' ? 'gym' : 'cali'; }
+function rawPal(sec) {
+  try { var p = localStorage.getItem(PAL_KEYS[sec]); if (p && PALETTES[p]) return p; } catch (e) { /* ignorar */ }
+  return 'default';
+}
+(function migrate() {            /* la elección de la v17 era global: pasa al Bloque A */
+  try {
+    var o = localStorage.getItem(PAL_OLD);
+    if (o !== null) { if (PALETTES[o] && !localStorage.getItem(PAL_KEYS.gym)) localStorage.setItem(PAL_KEYS.gym, o); localStorage.removeItem(PAL_OLD); }
+  } catch (e) { /* ignorar */ }
+})();
+function getPalette(sec) {
+  sec = sec || SEC;
+  var p = rawPal(sec);
+  if (p !== 'default' && sec === 'cali' && rawPal('gym') === p) return 'default';   /* nunca iguales, aunque alguien edite el dato */
+  return p;
+}
+function paintThemeColor() {
+  try {
+    var m = document.querySelector('meta[name="theme-color"]'), p = getPalette();
+    if (m) m.setAttribute('content', PALETTES[p] || D.packs[SEC].T.themeColor);
+  } catch (e) { /* ignorar */ }
+}
+function applyPalette(p) {
+  var root = document.documentElement;
+  if (PALETTES[p]) root.setAttribute('data-palette', p); else root.removeAttribute('data-palette');
+}
+function store(sec, p) {
+  try { if (p === 'default') localStorage.removeItem(PAL_KEYS[sec]); else localStorage.setItem(PAL_KEYS[sec], p); } catch (e) { /* ignorar */ }
+}
+/* Elige el color del bloque activo. Si el otro bloque ya lo tenía, el otro vuelve a su color predeterminado.
+   Devuelve el bloque que cambió solo (o '' si ninguno). */
+function setPalette(p) {
+  if (!PALETTES[p]) p = 'default';
+  var changed = '', o = otherSec(SEC);
+  store(SEC, p);
+  if (p !== 'default' && rawPal(o) === p) { store(o, 'default'); changed = o; }
+  applyPalette(p); paintThemeColor();
+  return changed;
+}
+applyPalette(getPalette());
+
 var REF = null, COL = null, pushing = false, again = false, timer = null;
 function pushRemote() {}
 function save() {
@@ -1039,7 +1454,8 @@ function applySection() {
   if (SEC === 'cali') root.setAttribute('data-section', 'cali'); else root.removeAttribute('data-section');
   try {
     var m = document.querySelector('meta[name="theme-color"]');
-    if (m) m.setAttribute('content', D.packs[SEC].T.themeColor);
+    if (m) m.setAttribute('content', PALETTES[getPalette()] || D.packs[SEC].T.themeColor);
+    applyPalette(getPalette());
     document.title = SEC === 'cali' ? 'Primer Set · Calistenia' : 'Primer Set';
   } catch (e) { /* ignorar */ }
 }
@@ -1176,7 +1592,7 @@ PS.s = {
   },
   norm: norm, save: save, hooks: hooks, initRemote: initRemote,
   getLog: getLog, ensureLog: ensureLog, dayPlan: dayPlan, isTrain: isTrain,
-  estMin: estMin, fitDay: fitDay, fitAll: fitAll, makePlan: makePlan, mainSec: mainSec, getTheme: getTheme, setTheme: setTheme, flush: flush, fmtEx: fmtEx, streak: streak, weekStats: weekStats, adherence: adherence
+  estMin: estMin, fitDay: fitDay, fitAll: fitAll, makePlan: makePlan, mainSec: mainSec, getTheme: getTheme, setTheme: setTheme, getPalette: getPalette, setPalette: setPalette, flush: flush, fmtEx: fmtEx, streak: streak, weekStats: weekStats, adherence: adherence
 };
 })();
 
@@ -2336,12 +2752,24 @@ function themeButtons(cur) {
   });
   return h + '</div>';
 }
+function sw(cols) { var r = ''; for (var i = 0; i < cols.length; i++) r += '<i style="background:' + cols[i] + '"></i>'; return r; }
+function paletteButtons(cur) {
+  var sec = PS.s.getSection(), oth = sec === 'cali' ? 'gym' : 'cali', op = ST.getPalette(oth);
+  var o = [['default', 'Predeterminado', sec === 'cali' ? ['#522B5B', '#DFB6B2', '#FBE4D8'] : ['#59171B', '#FED7B8', '#FCEBDD']], ['gray', 'Escala de grises', ['#111111', '#8C8C8C', '#F2F2F2']], ['blue', 'Gama de azules', ['#1D4E89', '#6FA8DC', '#D2E3F8']], ['warm', 'Gama cálida', ['#C0392B', '#E67E22', '#F5B041']]];
+  var on = oth === 'cali' ? 'Calistenia' : 'Gimnasio';
+  var h = '<div class="pal" role="group" aria-label="Colores de este bloque">';
+  o.forEach(function (x) {
+    h += '<button type="button" class="btn" data-act="palset" data-v="' + x[0] + '" aria-pressed="' + (cur === x[0]) + '"><span class="sw" aria-hidden="true">' + sw(x[2]) + '</span>' + x[1] +
+      (x[0] !== 'default' && op === x[0] ? ' <span class="muted small">· en ' + on + '</span>' : '') + '</button>';
+  });
+  return h + '</div>';
+}
 function renderPer() {
   var s = S(), p = s.profile, ui = PS.ui;
   var h = '<div class="card"><h2>🎯 Mi propósito</h2><label class="field"><span class="label">¿Por qué quieres entrenar?</span>' +
     '<textarea id="purposeIn" maxlength="140" placeholder="' + esc(D.T.ph) + '">' + esc(s.purpose) + '</textarea></label>' +
     '<div><button type="button" class="btn primary" data-act="savepurpose">Guardar propósito</button></div></div>';
-  h += '<div class="card"><h3>🎨 Apariencia</h3><p class="muted small">Elige claro, oscuro o que siga el modo de tu celular.</p>' + themeButtons(ST.getTheme()) + '<p class="muted small sec-hint"><span class="secdot" aria-hidden="true">' + (PS.s.getSection() === 'cali' ? '🏋️' : '🤸') + '</span> Para pasar a ' + (PS.s.getSection() === 'cali' ? 'Gimnasio' : 'Calistenia') + ' toca el botón redondo de arriba, junto al tema. Cada una guarda sus datos por separado.</p>' +
+  h += '<div class="card"><h3>🎨 Apariencia</h3><p class="muted small">Elige claro, oscuro o que siga el modo de tu celular.</p>' + themeButtons(ST.getTheme()) + '<span class="label" style="margin-top:12px;display:block">Colores</span><p class="muted small">Estos colores son solo de ' + (PS.s.getSection() === 'cali' ? 'Calistenia' : 'Gimnasio') + '. Cada bloque tiene su propio color y nunca se repiten: si eliges uno que ya usa el otro bloque, ese otro vuelve al suyo predeterminado.</p>' + paletteButtons(ST.getPalette()) + '<p class="muted small sec-hint"><span class="secdot" aria-hidden="true">' + (PS.s.getSection() === 'cali' ? '🏋️' : '🤸') + '</span> Para pasar a ' + (PS.s.getSection() === 'cali' ? 'Gimnasio' : 'Calistenia') + ' toca el botón redondo de arriba, junto al tema. Cada una guarda sus datos por separado.</p>' +
     '<div class="rowflex"><button type="button" class="btn sm" data-act="introtoggle">✨ Animación de entrada: ' + (function () { try { return localStorage.getItem('primerset.intro') === '0' ? 'apagada' : 'activada'; } catch (e) { return 'activada'; } })() + '</button></div></div>';
   h += '<div class="card"><h2>📏 Mis datos</h2><div class="grid2">' +
     '<label class="field"><span class="label">Altura (cm)</span><input type="number" id="hIn" inputmode="decimal" min="100" max="230" value="' + esc(p.height) + '"></label>' +
@@ -2367,10 +2795,11 @@ function renderPer() {
   } else if (U.isIOS()) {
     h += '<div class="card soft"><h3>🛟 Protege tu avance</h3><p class="muted small">Tus datos viven solo en este iPhone. Exporta una copia de seguridad de vez en cuando por si cambias de teléfono o reinstalas la app.</p></div>';
   }
-  h += '<div class="card"><h3>💾 Mis datos guardados</h3><p class="muted small">Tu avance se guarda solo en este navegador.' + CLOUD_NOTE + ' «Borrar todos mis datos» elimina los datos de Gimnasio y de Calistenia, y la copia temporal de una importación. Tu tema y tu elección de bloque no se borran.</p><div class="rowflex">' +
+  h += '<div class="card"><h3>💾 Mis datos guardados</h3><p class="muted small">Tu avance se guarda solo en este navegador.' + CLOUD_NOTE + ' «Borrar todos mis datos» elimina los datos de Gimnasio y de Calistenia, y la copia temporal de una importación. También borra tu fecha de nacimiento, así la app no guarda ningún dato tuyo. Tu tema, tus colores y tu elección de bloque no se borran.</p><div class="rowflex">' +
     (ui.confirmReset
       ? '<button type="button" class="btn warn" data-act="reset">Confirmar: borrar todo</button><button type="button" class="btn ghost" data-act="resetcancel">Cancelar</button>'
       : '<button type="button" class="btn" data-act="reset">Borrar todos mis datos</button>') + '</div></div>';
+  h += V.ageCard();
   h += V.legalCard();
   $('#v-per').innerHTML = h;
 }
@@ -2439,7 +2868,8 @@ var DOCS = {
     ['8. Sin garantías', 'La app se ofrece «tal cual», sin garantía de resultados físicos ni de funcionamiento continuo o libre de errores. Aunque se prueba con cuidado, pueden existir fallos.'],
     ['9. Límite de responsabilidad', 'En la medida que permita la ley, quien creó la app no es responsable por lesiones, pérdidas de datos o daños derivados del uso de la app o de seguir sus recomendaciones. Esto no limita derechos que la ley no permita limitar.'],
     ['10. Propiedad', 'El diseño, los textos y el código de la app pertenecen a su autor. Tus datos y tus registros son tuyos.'],
-    ['11. Cambios', 'Estos términos pueden actualizarse. Si cambian de forma importante, la app te pedirá aceptarlos otra vez.']
+    ['11. Edad mínima', 'Debes tener 18 años o más para usar la app. Si no los tienes, la app se bloquea hasta que los cumplas.'],
+    ['12. Cambios', 'Estos términos pueden actualizarse. Si cambian de forma importante, la app te pedirá aceptarlos otra vez.']
   ] },
   priv: { e: '🔒', name: 'Política de seguridad y privacidad', body: [
     ['1. Qué datos guardamos', 'Solo lo que tú escribes: propósito, altura, peso, contextura, lugar de entrenamiento, rutina, registros de días, pesos y repeticiones, metas, medallas, logros y tu elección de tema y bloque. Gimnasio y Calistenia guardan sus datos por separado.'],
@@ -2450,7 +2880,7 @@ var DOCS = {
     ['6. Seguridad', 'La app no pide contraseñas ni datos de pago, y no ejecuta código de terceros. Aun así, ningún sistema es perfecto: usa el bloqueo de pantalla de tu celular, porque quien tenga acceso a tu teléfono desbloqueado puede ver la app. Los archivos de copia de seguridad contienen todos tus datos; guárdalos en un lugar seguro y no los compartas.'],
     ['7. Tus derechos', 'Puedes ver, corregir, exportar, importar o borrar tus datos cuando quieras desde la propia app (Ajustes → «Borrar todos mis datos»). También se borran al limpiar los datos del navegador. Como los datos están solo en tu dispositivo, tú tienes el control total sobre ellos; esto va en línea con los derechos de conocer, actualizar, rectificar y suprimir tus datos personales que reconoce la normativa colombiana de protección de datos.'],
     ['8. Cuánto tiempo se guardan', 'Mientras no los borres. La app no tiene copias propias, así que no puede recuperarlos si los eliminas.'],
-    ['9. Menores de edad', 'La app está pensada para personas mayores de edad. Si eres menor, úsala con la guía de un adulto responsable.'],
+    ['9. Edad mínima', 'Solo pueden usar la app personas de 18 años o más. Al abrirla te pedimos tu fecha de nacimiento para calcular tu edad; se guarda únicamente en tu dispositivo, no se envía a ningún servidor y, una vez confirmada, no se puede cambiar desde la app. Es una verificación sencilla basada en lo que tú declaras: no comprueba documentos.'],
     ['10. Contacto', 'Si encuentras un problema de seguridad o tienes dudas sobre esta política, escribe a quien te compartió la app para que lo corrija.'],
     ['11. Cambios', 'Esta política puede actualizarse. Si cambia de forma importante, la app te lo mostrará antes de continuar.']
   ] }
@@ -3072,7 +3502,7 @@ function tokens(q) {
 }
 function hay(l) {
   var pl = sectionIsHome(l), place = pl.home ? ' casa' : '', park = pl.park ? ' parque' : '', gym = (D.T.id !== 'cali') ? ' gimnasio' : '';
-  return norm(l.n + ' | ' + l.g + ' | ' + (l.m || '') + ' | ' + lvName(l.lv)) + place + park + gym;
+  return norm(l.n + ' | ' + l.g + ' | ' + (l.m || '') + ' | ' + (l.main || '') + ' | ' + (l.eq || '') + ' | ' + lvName(l.lv)) + place + park + gym;
 }
 function score(l, h, toks) {
   var name = norm(l.n), sc = 0;
@@ -3136,14 +3566,31 @@ function render() {
     '<button type="button" class="gs-x" data-act="gclr" aria-label="Borrar búsqueda"' + (ui.q ? '' : ' hidden') + '>✕</button></div>' +
     '<div class="gs-chips" role="group" aria-label="Grupo muscular"><button type="button" class="chip" data-act="gfil" data-v="" aria-pressed="' + (!ui.g) + '">Todos</button>';
   D.GROUPS.forEach(function (g) { h += '<button type="button" class="chip" data-act="gfil" data-v="' + esc(g) + '" aria-pressed="' + (ui.g === g) + '">' + (D.GROUP_EMOJI[g] || '') + ' ' + esc(g) + '</button>'; });
-  h += '</div></div><div class="card" id="gList">' + listHtml() + '</div>';
+  h += '</div></div><div class="card" id="gList">' + listHtml() + '</div><p class="muted small gnote">ℹ️ Los ejercicios nuevos se eligen por el músculo que trabajan, el movimiento y lo fácil que es aprenderlos; no se prometen resultados concretos. Para dolor, lesiones o condiciones de salud, consulta a un profesional.</p>';
   $('#v-gui').innerHTML = h;
+}
+function li(a) { var h = ''; a.forEach(function (x) { h += '<li>' + esc(x) + '</li>'; }); return h; }
+function fichaHtml(l) {
+  var pl = sectionIsHome(l), cali = D.T.id === 'cali';
+  return '<div class="rowflex"><span class="pill">' + esc(lvName(l.lv)) + '</span>' +
+    (pl.home ? '<span class="pill">🏠 Casa</span>' : '') + (pl.park ? '<span class="pill">🌳 Parque</span>' : '') +
+    (cali ? '<span class="pill">🤸 Calistenia</span>' : '<span class="pill">' + (pl.home ? '🏋️ Gimnasio' : '🏋️ Solo gimnasio') + '</span>') + '</div>' +
+    '<p><b>🧰 Equipo:</b> ' + esc(l.eq) + '</p>' +
+    '<p><b>🎯 Principal:</b> ' + esc(l.main) + '</p>' +
+    '<p><b>💥 Secundarios:</b> ' + esc(l.m) + '</p>' +
+    '<p><b>✅ Cómo hacerlo:</b></p><ol class="fi-steps">' + li(l.steps) + '</ol>' +
+    '<p><b>🚫 Errores frecuentes:</b></p><ul class="fi-steps">' + li(l.err) + '</ul>' +
+    '<p><b>📏 Dosis inicial:</b> ' + esc(D.libDose(l)) + ' · descanso ' + esc(String(l.d[2])) + ' s</p>' +
+    '<p><b>🔽 Más fácil:</b> ' + esc(l.easy) + '</p><p><b>🔼 Más difícil:</b> ' + esc(l.hard) + '</p>' +
+    '<p><b>⚠️ Cuida:</b> ' + esc(l.adv) + '</p>' +
+    '<p class="muted small">Todavía no tiene ilustración. Detente si sientes dolor agudo o mareo.</p>';
 }
 function fill(det) {
   var box = det.querySelector('.gx-b');
   if (!box || box.getAttribute('data-ok')) return;
   var l = D.libFind(det.getAttribute('data-ex'));
   if (!l) return;
+  if (l.steps) { box.setAttribute('data-ok', '1'); box.innerHTML = fichaHtml(l); return; }
   var key = tplOf(l), t = TPL[key] || TPL.run, pl = sectionIsHome(l);
   box.setAttribute('data-ok', '1');
   var hold = !!t.hold, asPhotos = reduce && !hold;
@@ -3202,6 +3649,149 @@ document.addEventListener('click', function (ev) {
 V.renderGui = render;
 V.guiReset = function () { ui.g = ''; ui.q = ''; ui.lim = 30; };
 D.illus = { tplOf: tplOf, figure: figure, TPL: TPL, solve: solve, frameAt: frameAt, paint: paint };
+})();
+
+(function () {
+'use strict';
+var PS_ = PS, U = PS_.u, V = PS_.v;
+var esc = U.esc;
+var MIN_AGE = 18;                 /* edad mínima para usar la app: cámbiala aquí si lo decides */
+var AKEY = 'primerset.age';
+var mem = null;                   /* respaldo en memoria si el navegador no deja guardar */
+
+function pad(n) { return (n < 10 ? '0' : '') + n; }
+function key(y, m, d) { return y + '-' + pad(m) + '-' + pad(d); }
+function sum(b) {                 /* huella para detectar cambios hechos a mano en el dato guardado */
+  var s = 'ps|age|v1|' + b, h = 2166136261, i;
+  for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h.toString(16);
+}
+function parse(b) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(b || '');
+  if (!m) return null;
+  var y = +m[1], mo = +m[2], d = +m[3], dt = new Date(y, mo - 1, d);
+  if (dt.getFullYear() !== y || dt.getMonth() !== mo - 1 || dt.getDate() !== d) return null;
+  return { y: y, m: mo, d: d };
+}
+function ageOf(b, now) {
+  var p = parse(b); if (!p) return -1;
+  now = now || new Date();
+  var a = now.getFullYear() - p.y, bm = now.getMonth() + 1 - p.m;
+  if (bm < 0 || (bm === 0 && now.getDate() < p.d)) a--;
+  return a;
+}
+function fdate(d) { return U.longDate(d).toLowerCase() + ' de ' + d.getFullYear(); }
+function todayKey() { var n = new Date(); return key(n.getFullYear(), n.getMonth() + 1, n.getDate()); }
+
+/* Estado guardado: ok (dato válido), none (nunca se pidió) o tampered (alguien lo cambió a mano) */
+function read() {
+  var raw = null, r = null;
+  try { raw = localStorage.getItem(AKEY); } catch (e) { /* ignorar */ }
+  if (raw == null) return mem ? { st: 'ok', b: mem.b } : { st: 'none' };
+  try { r = JSON.parse(raw); } catch (e) { r = null; }
+  if (!r || typeof r.b !== 'string' || !parse(r.b) || r.c !== sum(r.b)) return { st: 'tampered' };
+  return { st: 'ok', b: r.b };
+}
+function save(b) {
+  mem = { b: b };
+  try { localStorage.setItem(AKEY, JSON.stringify({ v: 1, b: b, c: sum(b) })); } catch (e) { /* ignorar */ }
+}
+function eligibleDate(b) {
+  var p = parse(b), y = p.y + MIN_AGE;
+  return fdate(new Date(y, p.m - 1, p.d));
+}
+
+var box = null, st = { b: '', age: 0, step: 'ask', err: '', done: null };
+function el() {
+  if (box) return box;
+  box = document.createElement('div');
+  box.id = 'agegate'; box.className = 'modal'; box.hidden = true; box.style.zIndex = '70';
+  document.body.appendChild(box);
+  return box;
+}
+function lock(on) {
+  document.body.classList.toggle('gated', on);
+  document.body.classList.toggle('noscroll', on);
+}
+function render() {
+  var m = el(), h = '<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="agTitle">';
+  if (st.step === 'ask') {
+    h += '<div class="stack"><h2 id="agTitle">🎂 Verifica tu edad</h2><p class="muted">Primer Set es para personas de ' + MIN_AGE + ' años o más. Escribe tu fecha de nacimiento y la app calcula tu edad sola.</p></div>' +
+      '<label class="field agin"><span class="label">Fecha de nacimiento</span><input type="date" id="agDate" min="1900-01-01" max="' + todayKey() + '" value="' + esc(st.b) + '" autocomplete="bday" aria-describedby="agLive"></label>' +
+      '<p class="aglive" id="agLive" aria-live="polite">' + liveText(st.b) + '</p>' +
+      (st.err ? '<p class="agerr" role="alert">❌ ' + esc(st.err) + '</p>' : '') +
+      '<div class="agwarn" role="note"><span class="agw-i" aria-hidden="true">⚠️</span><div><b>Importante: no podrás cambiar esta fecha.</b> Una vez confirmada queda bloqueada. Escríbela con cuidado y con tu fecha real.</div></div>' +
+      '<p class="muted small">🔒 Se guarda solo en este dispositivo.</p>' +
+      '<button type="button" class="btn primary agbtn" data-act="agnext">Continuar</button>';
+  } else if (st.step === 'confirm') {
+    h += '<div class="stack"><h2 id="agTitle">¿Es correcta?</h2><p class="agbig">Naciste el <b>' + esc(fdate(U.parseKey(st.b))) + '</b><br>y tienes <b>' + st.age + ' años</b>.</p></div>' +
+      '<div class="agwarn" role="alert"><span class="agw-i" aria-hidden="true">⚠️</span><div><b>Si confirmas, no podrás modificarla.</b> Si hay un error, toca «Corregir» ahora.</div></div>' +
+      '<div class="agrow"><button type="button" class="btn primary agbtn" data-act="agok">Sí, confirmar</button><button type="button" class="btn agbtn" data-act="agback">Corregir</button></div>';
+  } else if (st.step === 'minor') {
+    h += '<div class="stack"><h2 id="agTitle">🔒 Aún no puedes usar la app</h2><div class="agwarn" role="alert"><span class="agw-i" aria-hidden="true">⚠️</span><div><b>Primer Set es para personas de ' + MIN_AGE + ' años o más.</b></div></div>' +
+      '<p>Podrás usarla desde el <b>' + esc(eligibleDate(st.b)) + '</b>.</p>' +
+      '<p class="muted">Mientras tanto, si quieres entrenar, hazlo con la guía de un adulto responsable o de un profesional.</p></div>';
+  } else {
+    h += '<div class="stack"><h2 id="agTitle">🔒 No pudimos verificar tu edad</h2><div class="agwarn" role="alert"><span class="agw-i" aria-hidden="true">⚠️</span><div><b>El dato de edad guardado fue modificado o está dañado.</b> Por seguridad, la app se bloqueó.</div></div>' +
+      '<p class="muted small">Si es un error, borra los datos de este sitio en el navegador para empezar de nuevo.</p></div>';
+  }
+  m.innerHTML = h + '</div>';
+  m.hidden = false; lock(true);
+  var f = m.querySelector('input'); if (f) { try { f.focus({ preventScroll: true }); } catch (e) { /* ignorar */ } }
+}
+function liveText(v) {
+  var p = parse(v), a = ageOf(v);
+  if (!v) return 'Elige tu fecha de nacimiento.';
+  if (!p || v > todayKey() || p.y < 1900 || a < 0 || a > 110) return 'Esa fecha no es posible.';
+  return 'Tendrías <b>' + a + ' años</b>.';
+}
+function open() { var m = el(); m.hidden = true; m.innerHTML = ''; lock(false); }
+
+/* Punto de entrada: cont se ejecuta solo si la persona puede usar la app */
+function check(cont) {
+  var r = read();
+  st.done = cont || null;
+  if (r.st === 'tampered') { st.step = 'tampered'; render(); return; }
+  if (r.st === 'ok') {
+    if (ageOf(r.b) >= MIN_AGE) { open(); if (cont) cont(); return; }
+    st.b = r.b; st.step = 'minor'; render(); return;
+  }
+  st.b = ''; st.err = ''; st.step = 'ask'; render();
+}
+function next() {
+  var inp = document.getElementById('agDate'), v = inp ? inp.value : '';
+  var p = parse(v), a = ageOf(v);
+  if (!p) { st.err = 'Escribe una fecha válida.'; st.b = ''; render(); return; }
+  if (v > todayKey() || p.y < 1900 || a < 0) { st.err = 'Esa fecha no es posible. Revísala.'; st.b = v; render(); return; }
+  if (a > 110) { st.err = 'Esa fecha no es posible. Revísala.'; st.b = v; render(); return; }
+  st.b = v; st.age = a; st.err = ''; st.step = 'confirm'; render();
+}
+document.addEventListener('click', function (ev) {
+  var t = ev.target && ev.target.closest ? ev.target.closest('[data-act^="ag"]') : null;
+  if (!t) return;
+  var a = t.getAttribute('data-act');
+  if (a === 'agnext') next();
+  else if (a === 'agback') { st.step = 'ask'; st.err = ''; render(); }
+  else if (a === 'agok') { save(st.b); check(st.done); }
+}, true);
+document.addEventListener('input', function (ev) {
+  if (!ev.target || ev.target.id !== 'agDate') return;
+  var l = document.getElementById('agLive'); if (l) l.innerHTML = liveText(ev.target.value);
+  var e = document.querySelector('#agegate .agerr'); if (e) e.parentNode.removeChild(e);
+});
+document.addEventListener('keydown', function (ev) {
+  if (ev.key === 'Enter' && ev.target && ev.target.id === 'agDate') { ev.preventDefault(); next(); }
+});
+
+/* Tarjeta de Ajustes: solo muestra, no deja editar */
+function card() {
+  var r = read();
+  if (r.st !== 'ok') return '';
+  return '<div class="card"><h3>🎂 Edad verificada</h3><p class="muted small">Tienes ' + ageOf(r.b) + ' años (' + esc(fdate(U.parseKey(r.b))) + '). Este dato está bloqueado y no se puede cambiar desde la app.</p></div>';
+}
+V.ageReset = function () { mem = null; try { localStorage.removeItem(AKEY); } catch (e) { /* ignorar */ } };
+V.ageCheck = check; V.ageCard = card;
+V.ageT = { ageOf: ageOf, sum: sum, MIN: MIN_AGE };
 })();
 
 (function () {
@@ -3473,6 +4063,7 @@ document.addEventListener('click', function (ev) {
     toast(nx === 'system' ? '🌗 Tema del sistema' : nx === 'light' ? '☀️ Tema claro' : '🌙 Tema oscuro');
     return;
   }
+  if (a === 'palset') { var ch = ST.setPalette(v); V.renderHeader(); V.renderPer(); toast(ch ? '🎨 Colores aplicados. ' + (ch === 'cali' ? 'Calistenia' : 'Gimnasio') + ' volvió a su color para no repetirse' : '🎨 Colores aplicados'); return; }
   if (a === 'themeset') { ST.setTheme(v); V.renderHeader(); V.renderPer(); return; }
 
   /* Registro */
@@ -3609,7 +4200,7 @@ document.addEventListener('click', function (ev) {
   }
   if (a === 'reset') {
     if (!ui.confirmReset) { ui.confirmReset = true; V.renderPer(); return; }
-    ui.confirmReset = false; ui.step = 1; ui.mErr = ''; ui.prevState = null; ST.reset(); V.legalReset(); renderAll(); V.showLegal(true, function () { V.renderModal(); }); return;
+    ui.confirmReset = false; ui.step = 1; ui.mErr = ''; ui.prevState = null; ST.reset(); V.legalReset(); V.ageReset(); renderAll(); V.ageCheck(function () { V.showLegal(true, function () { V.renderModal(); }); }); return;
   }
   if (a === 'resetcancel') { ui.confirmReset = false; V.renderPer(); return; }
   if (a === 'install') { if (PS.install && PS.install.prompt) PS.install.prompt(); return; }
@@ -3775,7 +4366,7 @@ function init() {
   renderAll();
   timerShow();
   var firstRun = function () { if (!S().purpose) { ui.step = 1; V.renderModal(); } };
-  playIntro(function () { if (V.legalNeeded()) V.showLegal(true, firstRun); else firstRun(); });
+  playIntro(function () { V.ageCheck(function () { if (V.legalNeeded()) V.showLegal(true, firstRun); else firstRun(); }); });
   ST.initRemote();
   var lastDay = U.dkey(V.today());
   setInterval(function () {
